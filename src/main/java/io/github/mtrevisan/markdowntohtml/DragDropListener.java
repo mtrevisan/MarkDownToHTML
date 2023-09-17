@@ -95,7 +95,7 @@ public class DragDropListener implements DropTargetListener{
 								outPane.setMessage("Output saved");
 								outPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
 								outPane.setOptionType(JOptionPane.DEFAULT_OPTION);
-								final JDialog dialog = outPane.createDialog(null, "Option Title");
+								final JDialog dialog = outPane.createDialog(null, "Processing result");
 								dialog.setVisible(true);
 							}
 							catch(final IOException e){
