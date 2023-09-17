@@ -39,6 +39,7 @@ import java.awt.dnd.DropTargetListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 
@@ -88,7 +89,7 @@ public class DragDropListener implements DropTargetListener{
 
 							//save output
 							final File outFile = new File(outFolder, FileUtil.getNameOnly(file) + ".html");
-							try(final FileWriter writer = new FileWriter(outFile)){
+							try(final FileWriter writer = new FileWriter(outFile, StandardCharsets.UTF_8)){
 								writer.write(html);
 
 								final JOptionPane outPane = new JOptionPane();
