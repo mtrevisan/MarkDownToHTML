@@ -164,6 +164,7 @@
 			</build>
 		</profile>
 	</profiles>
+
 	<build>
 		<plugins>
 			<!-- Compiler -->
@@ -178,28 +179,28 @@
 					<showDeprecation>true</showDeprecation>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>com.google.code.maven-replacer-plugin</groupId>
-				<artifactId>replacer</artifactId>
-				<version>${maven-replacer-plugin.version}</version>
-				<executions>
-					<execution>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>replace</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<file>${project.build.directory}/packaging/run.bat</file>
-					<replacements>
-						<replacement>
-							<token>\\\\</token>
-							<value>\\</value>
-						</replacement>
-					</replacements>
-				</configuration>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>com.google.code.maven-replacer-plugin</groupId>-->
+<!--				<artifactId>replacer</artifactId>-->
+<!--				<version>${maven-replacer-plugin.version}</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<phase>process-resources</phase>-->
+<!--						<goals>-->
+<!--							<goal>replace</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--				<configuration>-->
+<!--					<file>${project.build.directory}/packaging/run.bat</file>-->
+<!--					<replacements>-->
+<!--						<replacement>-->
+<!--							<token>\\\\</token>-->
+<!--							<value>\\</value>-->
+<!--						</replacement>-->
+<!--					</replacements>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
 
 			<!-- Shade -->
 			<!-- NOTE: shade 3.3.0 does not support java 16 yet! -->
@@ -252,6 +253,17 @@
 <!--								</transformer>-->
 <!--							</transformers>-->
 <!--						</configuration>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
+<!--			<plugin>-->
+<!--				<artifactId>maven-jar-plugin</artifactId>-->
+<!--				<version>3.3.0</version>-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<goals>-->
+<!--							<goal>jar</goal>-->
+<!--						</goals>-->
 <!--					</execution>-->
 <!--				</executions>-->
 <!--			</plugin>-->
@@ -319,7 +331,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${project.basedir}/src/tools/FastCopy/FastCopy.exe</executable>
+							<executable>${project.basedir}/tools/FastCopy/FastCopy.exe</executable>
 							<arguments>
 								<argument>/no_ui</argument>
 								<argument>/log=FALSE</argument>
@@ -345,8 +357,8 @@
 								<argument>--no-header-files</argument>
 								<argument>--no-man-pages</argument>
 								<argument>--include-locales=${jvm.locales}</argument>
-								<argument>--module-path</argument>
-								<argument>./${jvm.temporaryFolder}</argument>
+<!--								<argument>&#45;&#45;module-path</argument>-->
+<!--								<argument>./${jvm.temporaryFolder}</argument>-->
 								<argument>--add-modules</argument>
 								<argument>${jvm.modules}</argument>
 								<argument>--output</argument>
@@ -354,17 +366,22 @@
 							</arguments>
 						</configuration>
 					</execution>
+					<!-- Launcher -->
 					<execution>
-						<id>bat2exe</id>
+						<id>prepare-bat2exe</id>
 						<phase>package</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${project.basedir}/src/tools/AdvancedBATToEXE/aB2Econv_boxed.exe</executable>
+							<executable>${project.basedir}/tools/FastCopy/FastCopy.exe</executable>
 							<arguments>
-								<argument>${project.build.directory}/packaging/run.bat</argument>
-								<argument>${project.build.directory}/${jvm.outputFolder}/${app.name}.exe</argument>
+								<argument>/no_ui</argument>
+								<argument>/log=FALSE</argument>
+								<argument>/estimate=FALSE</argument>
+								<argument>/cmd=force_copy</argument>
+								<argument>"${project.basedir}/tools/BAT2EXE/RunNHide.exe"</argument>
+								<argument>/to="${project.build.directory}/packaging-launcher"</argument>
 							</arguments>
 						</configuration>
 					</execution>
@@ -376,7 +393,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${project.basedir}/src/tools/FastCopy/FastCopy.exe</executable>
+							<executable>${project.basedir}/tools/FastCopy/FastCopy.exe</executable>
 							<arguments>
 								<argument>/no_ui</argument>
 								<argument>/log=FALSE</argument>
@@ -384,22 +401,6 @@
 								<argument>/cmd=move</argument>
 								<argument>"${project.build.directory}/${jvm.temporaryFolder}"</argument>
 								<argument>/to="${project.build.directory}/${jvm.outputFolder}/app"</argument>
-							</arguments>
-						</configuration>
-					</execution>
-					<!-- run inno setup to create installer -->
-					<execution>
-						<id>installer</id>
-						<phase>package</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<workingDirectory>${project.build.directory}</workingDirectory>
-							<executable>C:/Program Files (x86)/Inno Setup 6/iscc.exe</executable>
-							<arguments>
-								<argument>/Q</argument>
-								<argument>${project.build.directory}/packaging/installer.iss</argument>
 							</arguments>
 						</configuration>
 					</execution>
@@ -433,14 +434,6 @@
 				<directory>${project.basedir}/src/packaging</directory>
 				<filtering>true</filtering>
 				<targetPath>${project.build.directory}/packaging</targetPath>
-			</resource>
-			<!-- Add the default resource path back in - by overriding above it disables the default -->
-			<resource>
-				<directory>${project.basedir}/src/main/resources</directory>
-				<includes>
-					<include>*.*</include>
-				</includes>
-				<filtering>true</filtering>
 			</resource>
 		</resources>
 	</build>
