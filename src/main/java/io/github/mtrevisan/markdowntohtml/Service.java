@@ -65,6 +65,10 @@ public class Service{
 			.set(TablesExtension.APPEND_MISSING_COLUMNS, true)
 			.set(TablesExtension.DISCARD_EXTRA_COLUMNS, true)
 			.set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
+
+//			.set(TablesExtension.FOOTNOTE_SORT, ElementPlacement.AS_IS)
+			.set(TablesExtension.FOOTNOTE_SORT, ElementPlacement.SORT)
+
 			.set(Parser.EXTENSIONS, List.of(TablesExtension.create()));
 
 		final List<Parser.ParserExtension> opts = Arrays.asList(
@@ -128,7 +132,7 @@ public class Service{
 					</head>
 
 					<body class="stackedit">
-						<div class="stackedit__html" style="text-align:justify;hyphens:auto;">
+						<div class="stackedit__html" style="text-align:justify;hyphens:none;">
 					""";
 			final String htmlEnd = """
 					</div>
