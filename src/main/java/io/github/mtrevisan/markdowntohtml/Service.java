@@ -43,13 +43,17 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.StringJoiner;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
 public class Service{
 
-	private static final String KATEX_BOUNDARY = "$";
+	private static final Random RANDOM = new Random();
+
+	private static final Pattern KATEX_BOUNDARY_PATTERN = Pattern.compile("(\\$\\$?)(.*?)\\\\(.*?)(\\$\\$?)");
 
 
 	private static final Parser PARSER;
@@ -87,10 +91,29 @@ public class Service{
 
 	public static String convert(final File file) throws IOException{
 		try(final BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))){
-			final String content = r.lines()
+			String content = r.lines()
 				.collect(Collectors.joining("\n"));
+			content = replaceBackslash(content);
+			//obfuscate emails
+			content = obfuscateEmails(content);
 
-			final Node document = PARSER.parse(replaceBackslash(content));
+			final Node document = PARSER.parse(content);
+			/*
+			add this javascript code to manage `eml` elements:
+			var allElements = document.getElementsByClassName("eml");
+			for(var i = 0; i < allElements.length; i ++)
+				updateAnchor(allElements[i])
+			function updateAnchor(el){
+				el.href = 'mailto:' + decode(el.href);
+			}
+			function decode(encoded){
+				var decoded = "";
+				var key = parseInt(encoded.substr(0, 2), 16);
+				for(var n = 2; n < encoded.length; n += 2)
+					decoded += String.fromCharCode(parseInt(encoded.substr(n, 2), 16) ^ key);
+				return decoded;
+			}
+			 */
 			String htmlBegin = """
 					<!DOCTYPE html>
 					<html lang="it">
@@ -130,7 +153,7 @@ public class Service{
 						], throwOnError: false});"></script>
 					</head>
 
-					<body class="stackedit">
+					<body onload="javascript:var a=document.getElementsByClassName("eml");for(var i=0;i<a.length;i++)b(a[i])function b(el){el.href='mailto:'+c(el.href)}function c(d){var e="";var f=parseInt(d.substr(0, 2),16);for(var n=2;n<d.length;n+=2)e+=String.fromCharCode(parseInt(d.substr(n,2),16)^f);return e;}" class="stackedit">
 						<div class="stackedit__html" style="text-align:justify;hyphens:none;">
 					""";
 			final String htmlEnd = """
@@ -169,9 +192,45 @@ public class Service{
 //		return replacement;
 //	}
 
+	/** Replaces `\` inside `$` or `$$` into `\\`. */
 	private static String replaceBackslash(final String input){
-		// Replace character inside two $ or two $$
-		return input.replaceAll("(\\$\\$?)(.*?)\\\\(.*?)(\\$\\$?)", "$1$2\\\\\\\\$3$4");
+		return KATEX_BOUNDARY_PATTERN.matcher(input)
+			.replaceAll("$1$2\\\\\\\\$3$4");
+//		return input.replaceAll("(\\$\\$?)(.*?)\\\\(.*?)(\\$\\$?)", "$1$2\\\\\\\\$3$4");
+	}
+
+	private static String obfuscateEmails(final String input){
+		String replacement = input;
+		int start = replacement.indexOf("<a ");
+		while(start != -1){
+			int end = replacement.indexOf(">", start + 3);
+			if(end == -1)
+				break;
+
+			final int startHRef = replacement.indexOf("href=\"", start + 3);
+			final int endHRef = replacement.indexOf("\"", startHRef);
+			final String href = replacement.substring(startHRef + 6, endHRef);
+
+			replacement = replacement.substring(0, startHRef)
+				+ "href=\""
+				+ encode(href, RANDOM.nextInt(256))
+				+ "\"";
+
+			end = replacement.indexOf(">", start + 3);
+			start = replacement.indexOf("<a ", end + 1);
+		}
+		return replacement;
+	}
+
+	private static String encode(final String decoded, final int key){
+		final StringBuilder sb = new StringBuilder(make2DigitsLong(key));
+		for(int n = 0; n < decoded.length(); n ++)
+			sb.append(make2DigitsLong(decoded.charAt(n) ^ key));
+		return sb.toString();
+	}
+
+	private static String make2DigitsLong(final int value){
+		return String.format("%02d", Integer.parseInt(Integer.toHexString(value)));
 	}
 
 }
