@@ -33,6 +33,7 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.KeepType;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
+import com.vladsch.flexmark.util.format.options.ElementPlacement;
 import com.vladsch.flexmark.util.format.options.ElementPlacementSort;
 import com.vladsch.flexmark.util.misc.FileUtil;
 
@@ -70,6 +71,7 @@ public class Service{
 			.set(TablesExtension.DISCARD_EXTRA_COLUMNS, true)
 			.set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
 
+			.set(FootnoteExtension.FOOTNOTE_PLACEMENT, ElementPlacement.DOCUMENT_TOP)
 //			.set(FootnoteExtension.FOOTNOTE_SORT, ElementPlacementSort.AS_IS)
 			.set(FootnoteExtension.FOOTNOTE_SORT, ElementPlacementSort.SORT)
 
@@ -197,13 +199,15 @@ public class Service{
 		final StringBuilder sb = new StringBuilder();
 		boolean betweenDollars = false;
 		boolean betweenDoubleDollars = false;
-		for(int i = 0; i < input.length(); i ++){
+		final int length = input.length();
+		for(int i = 0; i < length; i ++){
 			final char currentChar = input.charAt(i);
 
 			if(currentChar == '$'){
-				if(i + 1 < input.length() && input.charAt(i + 1) == '$'){
+				if(i + 1 < length && input.charAt(i + 1) == '$'){
 					betweenDoubleDollars = !betweenDoubleDollars;
-					sb.append(currentChar);
+					sb.append(currentChar)
+						.append(currentChar);
 					i ++;
 					continue;
 				}
@@ -211,7 +215,7 @@ public class Service{
 					betweenDollars = !betweenDollars;
 			}
 
-			if((betweenDollars || betweenDoubleDollars) && currentChar == '\\' && i + 1 < input.length()){
+			if((betweenDollars || betweenDoubleDollars) && currentChar == '\\' && i + 1 < length){
 				final char nextChar = input.charAt(i + 1);
 				if(nextChar == '%'){
 					sb.append("\\\\%");
