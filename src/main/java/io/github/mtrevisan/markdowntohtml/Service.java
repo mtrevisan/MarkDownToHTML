@@ -49,8 +49,7 @@ import java.util.stream.Collectors;
 
 public class Service{
 
-	private static final String KATEX_BOUNDARY = "$$";
-	private static final int KATEX_BOUNDARY_LENGTH = KATEX_BOUNDARY.length();
+	private static final String KATEX_BOUNDARY = "$";
 
 
 	private static final Parser PARSER;
@@ -149,25 +148,30 @@ public class Service{
 		}
 	}
 
+//	private static String replaceBackslash(final String input){
+//		String replacement = input;
+//		int start = replacement.indexOf(KATEX_BOUNDARY);
+//		while(start != -1){
+//			int end = replacement.indexOf(KATEX_BOUNDARY, start + KATEX_BOUNDARY.length());
+//			if(end == -1)
+//				break;
+//
+//			String substring = replacement.substring(start, end);
+//			substring = substring.replace("\\\\", "\\\\\\\\")
+//				.replace("\\%", "\\\\%");
+//			replacement = replacement.substring(0, start)
+//				+ substring
+//				+ replacement.substring(end);
+//
+//			end = replacement.indexOf(KATEX_BOUNDARY, start + KATEX_BOUNDARY.length());
+//			start = replacement.indexOf(KATEX_BOUNDARY, end + KATEX_BOUNDARY.length());
+//		}
+//		return replacement;
+//	}
+
 	private static String replaceBackslash(final String input){
-		String replacement = input;
-		int start = replacement.indexOf(KATEX_BOUNDARY);
-		while(start != -1){
-			int end = replacement.indexOf(KATEX_BOUNDARY, start + KATEX_BOUNDARY_LENGTH);
-			if(end == -1)
-				break;
-
-			String substring = replacement.substring(start, end);
-			substring = substring.replace("\\\\", "\\\\\\\\")
-				.replace("\\%", "\\\\%");
-			replacement = replacement.substring(0, start)
-				+ substring
-				+ replacement.substring(end);
-
-			end = replacement.indexOf(KATEX_BOUNDARY, start + KATEX_BOUNDARY_LENGTH);
-			start = replacement.indexOf(KATEX_BOUNDARY, end + KATEX_BOUNDARY_LENGTH);
-		}
-		return replacement;
+		// Replace character inside two $ or two $$
+		return input.replaceAll("(\\$\\$?)(.*?)\\\\(.*?)(\\$\\$?)", "$1$2\\\\\\\\$3$4");
 	}
 
 }
