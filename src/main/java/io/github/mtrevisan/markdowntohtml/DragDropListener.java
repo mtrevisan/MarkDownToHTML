@@ -72,18 +72,20 @@ public class DragDropListener implements DropTargetListener{
 			try{
 				//if the drop items are files
 				if(flavor.isFlavorJavaFileListType()){
+					//get all the dropped files
+					@SuppressWarnings("unchecked")
+					final List<File> files = (List<File>)transferable.getTransferData(flavor);
+
 					//ask for output directory
+					final String currentDir = (!files.isEmpty()? files.get(0).getParent(): "");
 					final JFileChooser dirChooser = new JFileChooser();
 					//start at application current directory
-					dirChooser.setCurrentDirectory(new File("."));
+					dirChooser.setCurrentDirectory(new File(currentDir));
 					dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					final int opt = dirChooser.showSaveDialog(null);
 					final File outFolder = (opt == JFileChooser.APPROVE_OPTION? dirChooser.getSelectedFile(): null);
 
 					if(outFolder != null){
-						//get all the dropped files
-						@SuppressWarnings("unchecked")
-						final List<File> files = (List<File>)transferable.getTransferData(flavor);
 						for(final File file : files){
 							final String html = Service.convert(file);
 

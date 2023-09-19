@@ -6,12 +6,12 @@
 
 	<groupId>io.maurotrevisan</groupId>
 	<artifactId>MarkDownToHTML</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 
 	<packaging>jar</packaging>
 
 	<name>MarkDownToHTML</name>
-	<description>Application for the conversion of MarkDown files into HTML using FlexMarker</description>
+	<description>Application for the conversion of MarkDown files into HTML using Flexmark</description>
 	<url>https://github.com/mtrevisan/MarkDownToHTML</url>
 
 	<developers>
@@ -78,7 +78,7 @@
 		<!-- https://code.google.com/archive/p/maven-replacer-plugin/ -->
 		<maven-replacer-plugin.version>1.5.3</maven-replacer-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-shade-plugin -->
-<!--		<maven-shade-plugin.version>3.5.0</maven-shade-plugin.version>-->
+		<maven-shade-plugin.version>3.5.0</maven-shade-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
 		<maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
 		<!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
@@ -107,20 +107,20 @@
 			<build>
 				<plugins>
 					<!-- Signing JAR Files -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>${maven-gpg-plugin.version}</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
+<!--					<plugin>-->
+<!--						<groupId>org.apache.maven.plugins</groupId>-->
+<!--						<artifactId>maven-gpg-plugin</artifactId>-->
+<!--						<version>${maven-gpg-plugin.version}</version>-->
+<!--						<executions>-->
+<!--							<execution>-->
+<!--								<id>sign-artifacts</id>-->
+<!--								<phase>verify</phase>-->
+<!--								<goals>-->
+<!--									<goal>sign</goal>-->
+<!--								</goals>-->
+<!--							</execution>-->
+<!--						</executions>-->
+<!--					</plugin>-->
 					<!-- Deploy -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -179,123 +179,81 @@
 					<showDeprecation>true</showDeprecation>
 				</configuration>
 			</plugin>
-<!--			<plugin>-->
-<!--				<groupId>com.google.code.maven-replacer-plugin</groupId>-->
-<!--				<artifactId>replacer</artifactId>-->
-<!--				<version>${maven-replacer-plugin.version}</version>-->
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						<phase>process-resources</phase>-->
-<!--						<goals>-->
-<!--							<goal>replace</goal>-->
-<!--						</goals>-->
-<!--					</execution>-->
-<!--				</executions>-->
-<!--				<configuration>-->
-<!--					<file>${project.build.directory}/packaging/run.bat</file>-->
-<!--					<replacements>-->
-<!--						<replacement>-->
-<!--							<token>\\\\</token>-->
-<!--							<value>\\</value>-->
-<!--						</replacement>-->
-<!--					</replacements>-->
-<!--				</configuration>-->
-<!--			</plugin>-->
-
-			<!-- Shade -->
-			<!-- NOTE: shade 3.3.0 does not support java 16 yet! -->
-<!--			<plugin>-->
-<!--				<groupId>org.apache.maven.plugins</groupId>-->
-<!--				<artifactId>maven-shade-plugin</artifactId>-->
-<!--				<version>${maven-shade-plugin.version}</version>-->
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						&lt;!&ndash; Run shade goal on package phase &ndash;&gt;-->
-<!--						<phase>package</phase>-->
-<!--						<goals>-->
-<!--							<goal>shade</goal>-->
-<!--						</goals>-->
-<!--						<configuration>-->
-<!--							<minimizeJar>true</minimizeJar>-->
-<!--							<shadedArtifactAttached>true</shadedArtifactAttached>-->
-<!--							<shadedClassifierName>shaded</shadedClassifierName>-->
-<!--							<outputDirectory>${project.build.directory}/${jvm.temporaryFolder}</outputDirectory>-->
-<!--							<filters>-->
-<!--								&lt;!&ndash; FIXME: strengthen the inclusions &ndash;&gt;-->
-<!--								&lt;!&ndash; ClassNotFoundException: ch.qos.logback.classic.boolex.OnMarkerEvaluator&ndash;&gt;-->
-<!--								<filter>-->
-<!--									<artifact>ch.qos.logback:logback-classic</artifact>-->
-<!--									<includes>-->
-<!--										<include>**</include>-->
-<!--									</includes>-->
-<!--								</filter>-->
-<!--								<filter>-->
-<!--									<artifact>*:*</artifact>-->
-<!--									<excludes>-->
-<!--										<exclude>LICENSE.txt</exclude>-->
-<!--										<exclude>META-INF/LICENSE</exclude>-->
-<!--										<exclude>META-INF/LICENSE.txt</exclude>-->
-<!--										<exclude>META-INF/NOTICE</exclude>-->
-<!--										<exclude>META-INF/NOTICE.txt</exclude>-->
-<!--									</excludes>-->
-<!--								</filter>-->
-<!--							</filters>-->
-<!--							<transformers>-->
-<!--								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
-<!--									<mainClass>${main.class}</mainClass>-->
-<!--									<manifestEntries>-->
-<!--										<X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>-->
-<!--										<X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>-->
-<!--										<Built-By>${app.vendor}</Built-By>-->
-<!--										<Build-Jdk>${java.version} (${java.vendor} ${java.vm.version})</Build-Jdk>-->
-<!--										<Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>-->
-<!--									</manifestEntries>-->
-<!--								</transformer>-->
-<!--							</transformers>-->
-<!--						</configuration>-->
-<!--					</execution>-->
-<!--				</executions>-->
-<!--			</plugin>-->
-<!--			<plugin>-->
-<!--				<artifactId>maven-jar-plugin</artifactId>-->
-<!--				<version>3.3.0</version>-->
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						<goals>-->
-<!--							<goal>jar</goal>-->
-<!--						</goals>-->
-<!--					</execution>-->
-<!--				</executions>-->
-<!--			</plugin>-->
-			<!-- Assembly / Make fat jar -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>${maven-assembly-plugin.version}</version>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>replacer</artifactId>
+				<version>${maven-replacer-plugin.version}</version>
 				<executions>
 					<execution>
-						<id>make-assembly</id>
-						<phase>prepare-package</phase>
+						<phase>process-resources</phase>
 						<goals>
-							<goal>single</goal>
+							<goal>replace</goal>
 						</goals>
 					</execution>
 				</executions>
 				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-					<archive>
-						<manifestEntries>
-							<Built-By>${app.vendor}</Built-By>
-						</manifestEntries>
-						<manifest>
-							<mainClass>${main.class}</mainClass>
-						</manifest>
-					</archive>
-					<outputDirectory>${project.build.directory}/${jvm.temporaryFolder}</outputDirectory>
-					<appendAssemblyId>false</appendAssemblyId>
+					<file>${project.build.directory}/packaging/run.bat</file>
+					<replacements>
+						<replacement>
+							<token>\\\\</token>
+							<value>\\</value>
+						</replacement>
+					</replacements>
 				</configuration>
+			</plugin>
+
+			<!-- Shade -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>${maven-shade-plugin.version}</version>
+				<executions>
+					<execution>
+						<!-- Run shade goal on package phase -->
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<minimizeJar>true</minimizeJar>
+							<shadedArtifactAttached>true</shadedArtifactAttached>
+							<shadedClassifierName>shaded</shadedClassifierName>
+							<outputDirectory>${project.build.directory}/${jvm.temporaryFolder}</outputDirectory>
+							<filters>
+								<!-- FIXME: strengthen the inclusions -->
+								<!-- ClassNotFoundException: ch.qos.logback.classic.boolex.OnMarkerEvaluator-->
+								<filter>
+									<artifact>ch.qos.logback:logback-classic</artifact>
+									<includes>
+										<include>**</include>
+									</includes>
+								</filter>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>LICENSE.txt</exclude>
+										<exclude>META-INF/LICENSE</exclude>
+										<exclude>META-INF/LICENSE.txt</exclude>
+										<exclude>META-INF/NOTICE</exclude>
+										<exclude>META-INF/NOTICE.txt</exclude>
+									</excludes>
+								</filter>
+							</filters>
+							<transformers>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>${main.class}</mainClass>
+									<manifestEntries>
+										<X-Compile-Source-JDK>${maven.compiler.source}</X-Compile-Source-JDK>
+										<X-Compile-Target-JDK>${maven.compiler.target}</X-Compile-Target-JDK>
+										<Built-By>${app.vendor}</Built-By>
+										<Build-Jdk>${java.version} (${java.vendor} ${java.vm.version})</Build-Jdk>
+										<Build-OS>${os.name} ${os.arch} ${os.version}</Build-OS>
+									</manifestEntries>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<!-- Jlink -->
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-antrun-plugin -->
@@ -366,22 +324,17 @@
 							</arguments>
 						</configuration>
 					</execution>
-					<!-- Launcher -->
 					<execution>
-						<id>prepare-bat2exe</id>
+						<id>bat2exe</id>
 						<phase>package</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${project.basedir}/tools/FastCopy/FastCopy.exe</executable>
+							<executable>${project.basedir}/tools/AdvancedBATToEXE/aB2Econv_boxed.exe</executable>
 							<arguments>
-								<argument>/no_ui</argument>
-								<argument>/log=FALSE</argument>
-								<argument>/estimate=FALSE</argument>
-								<argument>/cmd=force_copy</argument>
-								<argument>"${project.basedir}/tools/BAT2EXE/RunNHide.exe"</argument>
-								<argument>/to="${project.build.directory}/packaging-launcher"</argument>
+								<argument>${project.build.directory}/packaging/run.bat</argument>
+								<argument>${project.build.directory}/${jvm.outputFolder}/${app.name}.exe</argument>
 							</arguments>
 						</configuration>
 					</execution>
@@ -404,6 +357,22 @@
 							</arguments>
 						</configuration>
 					</execution>
+					<!-- run inno setup to create installer -->
+<!--					<execution>-->
+<!--						<id>installer</id>-->
+<!--						<phase>package</phase>-->
+<!--						<goals>-->
+<!--							<goal>exec</goal>-->
+<!--						</goals>-->
+<!--						<configuration>-->
+<!--							<workingDirectory>${project.build.directory}</workingDirectory>-->
+<!--							<executable>iscc.exe</executable>-->
+<!--							<arguments>-->
+<!--								<argument>/Q</argument>-->
+<!--								<argument>${project.build.directory}/packaging/installer.iss</argument>-->
+<!--							</arguments>-->
+<!--						</configuration>-->
+<!--					</execution>-->
 				</executions>
 				<configuration>
 					<systemProperties>

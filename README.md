@@ -1,2 +1,2 @@
 # MarkDownToHTML
-Application for the conversion of MarkDown files into HTML using FlexMarker
+Application for the conversion of MarkDown files into HTML using Flexmark

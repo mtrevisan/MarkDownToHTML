@@ -33,8 +33,6 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.KeepType;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-import com.vladsch.flexmark.util.format.options.ElementPlacement;
-import com.vladsch.flexmark.util.format.options.ElementPlacementSort;
 import com.vladsch.flexmark.util.misc.FileUtil;
 
 import java.io.BufferedReader;
@@ -43,10 +41,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.StringJoiner;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -55,39 +53,36 @@ public class Service{
 
 	private static final Random RANDOM = new Random();
 
-	private static final Pattern KATEX_BOUNDARY_PATTERN = Pattern.compile("(\\$\\$?)([^$]*?)\\\\(%[^$]*?)(\\$\\$?)");
+	private static final Pattern KATEX_PATTERN = Pattern.compile("(\\$\\$[^$]+\\$\\$|\\$[^$]+\\$)");
 
 
 	private static final Parser PARSER;
 	private static final HtmlRenderer RENDERER;
+
 	static{
 		final MutableDataSet options = new MutableDataSet()
 			.set(Parser.REFERENCES_KEEP, KeepType.LAST)
+			.set(Parser.EXTENSIONS, List.of(TablesExtension.create(), TypographicExtension.create(), SubscriptExtension.create(),
+				FootnoteExtension.create()))
+
 			.set(HtmlRenderer.INDENT_SIZE, 3)
 			.set(HtmlRenderer.PERCENT_ENCODE_URLS, true)
+			//convert soft-breaks to hard breaks
+			.set(HtmlRenderer.SOFT_BREAK, "<br />\n")
 
 			.set(TablesExtension.COLUMN_SPANS, false)
 			.set(TablesExtension.APPEND_MISSING_COLUMNS, true)
 			.set(TablesExtension.DISCARD_EXTRA_COLUMNS, true)
 			.set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
 
-			.set(FootnoteExtension.FOOTNOTE_PLACEMENT, ElementPlacement.DOCUMENT_TOP)
+//			.set(FootnoteExtension.FOOTNOTE_PLACEMENT, ElementPlacement.DOCUMENT_TOP)
 //			.set(FootnoteExtension.FOOTNOTE_SORT, ElementPlacementSort.AS_IS)
-			.set(FootnoteExtension.FOOTNOTE_SORT, ElementPlacementSort.SORT)
+//			.set(FootnoteExtension.FOOTNOTE_SORT, ElementPlacementSort.SORT)
+			;
 
-			.set(Parser.EXTENSIONS, List.of(TablesExtension.create()));
-
-		final List<Parser.ParserExtension> opts = Arrays.asList(
-			TablesExtension.create(),
-			TypographicExtension.create(),
-			SubscriptExtension.create(),
-			FootnoteExtension.create()
-		);
 		PARSER = Parser.builder(options)
-			.extensions(opts)
 			.build();
 		RENDERER = HtmlRenderer.builder(options)
-			.extensions(opts)
 			.build();
 	}
 
@@ -96,7 +91,10 @@ public class Service{
 		try(final BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))){
 			String content = r.lines()
 				.collect(Collectors.joining("\n"));
-			content = replaceBackslash(content);
+			//extract KaTeX code
+			final List<String> katexCodes = extractKaTeXCode(content);
+			content = replaceKaTeXWithPlaceholders(content, katexCodes);
+
 			//obfuscate emails
 			content = obfuscateEmails(content);
 
@@ -166,73 +164,35 @@ public class Service{
 				</html>
 				""";
 			htmlBegin = htmlBegin.replaceFirst("\\$\\{title\\}", FileUtil.getNameOnly(file));
-			final StringJoiner sj = new StringJoiner("", htmlBegin, htmlEnd);
 			final String html = RENDERER.render(document);
-			sj.add(html);
 
-			return sj.toString();
+			return htmlBegin
+				+ reinsertKaTeX(html, katexCodes)
+				+ htmlEnd;
 		}
 	}
 
-//	private static String replaceBackslash(final String input){
-//		String replacement = input;
-//		int start = replacement.indexOf(KATEX_BOUNDARY);
-//		while(start != -1){
-//			int end = replacement.indexOf(KATEX_BOUNDARY, start + KATEX_BOUNDARY.length());
-//			if(end == -1)
-//				break;
-//
-//			String substring = replacement.substring(start, end);
-//			substring = substring.replace("\\\\", "\\\\\\\\")
-//				.replace("\\%", "\\\\%");
-//			replacement = replacement.substring(0, start)
-//				+ substring
-//				+ replacement.substring(end);
-//
-//			end = replacement.indexOf(KATEX_BOUNDARY, start + KATEX_BOUNDARY.length());
-//			start = replacement.indexOf(KATEX_BOUNDARY, end + KATEX_BOUNDARY.length());
-//		}
-//		return replacement;
-//	}
 
-	private static String replaceBackslash(final String input){
-		final StringBuilder sb = new StringBuilder();
-		boolean betweenDollars = false;
-		boolean betweenDoubleDollars = false;
-		final int length = input.length();
-		for(int i = 0; i < length; i ++){
-			final char currentChar = input.charAt(i);
+	private static List<String> extractKaTeXCode(String input){
+		final List<String> katexCodes = new ArrayList<>();
+		final Matcher matcher = KATEX_PATTERN.matcher(input);
+		while(matcher.find())
+			katexCodes.add(matcher.group(1));
+		return katexCodes;
+	}
 
-			if(currentChar == '$'){
-				if(i + 1 < length && input.charAt(i + 1) == '$'){
-					betweenDoubleDollars = !betweenDoubleDollars;
-					sb.append(currentChar)
-						.append(currentChar);
-					i ++;
-					continue;
-				}
-				else
-					betweenDollars = !betweenDollars;
-			}
+	private static String replaceKaTeXWithPlaceholders(String input, final List<String> katexCodes){
+		final int size = katexCodes.size();
+		for(int i = 0; i < size; i ++)
+			input = input.replace(katexCodes.get(i), "[$$]{" + i + "}");
+		return input;
+	}
 
-			if((betweenDollars || betweenDoubleDollars) && currentChar == '\\' && i + 1 < length){
-				final char nextChar = input.charAt(i + 1);
-				if(nextChar == '%'){
-					sb.append("\\\\%");
-					i ++;
-					continue;
-				}
-				else if(nextChar == '\\'){
-					sb.append("\\\\\\\\");
-					i ++;
-					continue;
-				}
-			}
-
-			sb.append(currentChar);
-		}
-
-		return sb.toString();
+	private static String reinsertKaTeX(String input, final List<String> katexCodes){
+		final int size = katexCodes.size();
+		for(int i = 0; i < size; i ++)
+			input = input.replace("[$$]{" + i + "}", katexCodes.get(i));
+		return input;
 	}
 
 
