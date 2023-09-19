@@ -413,6 +413,12 @@
 			<groupId>com.vladsch.flexmark</groupId>
 			<artifactId>flexmark-all</artifactId>
 			<version>${vladsch.flexmark.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.vladsch.flexmark</groupId>
+					<artifactId>flexmark-java</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 

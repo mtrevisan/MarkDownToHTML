@@ -53,7 +53,8 @@ public class Service{
 
 	private static final Random RANDOM = new Random();
 
-	private static final Pattern KATEX_PATTERN = Pattern.compile("(\\$\\$[^$]+\\$\\$|\\$[^$]+\\$)");
+	private static final Pattern KATEX_PATTERN = Pattern.compile("(?:^|[^\\\\])(\\$\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$\\$|\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$)",
+		Pattern.MULTILINE | Pattern.UNICODE_CASE);
 
 
 	private static final Parser PARSER;
