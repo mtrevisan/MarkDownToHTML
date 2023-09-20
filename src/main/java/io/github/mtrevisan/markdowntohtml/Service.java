@@ -74,12 +74,7 @@ public class Service{
 			.set(TablesExtension.COLUMN_SPANS, false)
 			.set(TablesExtension.APPEND_MISSING_COLUMNS, true)
 			.set(TablesExtension.DISCARD_EXTRA_COLUMNS, true)
-			.set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
-
-//			.set(FootnoteExtension.FOOTNOTE_PLACEMENT, ElementPlacement.DOCUMENT_TOP)
-//			.set(FootnoteExtension.FOOTNOTE_SORT, ElementPlacementSort.AS_IS)
-//			.set(FootnoteExtension.FOOTNOTE_SORT, ElementPlacementSort.SORT)
-			;
+			.set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true);
 
 		PARSER = Parser.builder(options)
 			.build();
@@ -94,7 +89,7 @@ public class Service{
 				.collect(Collectors.joining("\n"));
 			//extract KaTeX code
 			final List<String> katexCodes = extractKaTeXCode(content);
-			content = replaceKaTeXWithPlaceholders(content, katexCodes);
+			content = replaceKaTeXCodeWithPlaceholders(content, katexCodes);
 
 			//obfuscate emails
 			content = obfuscateEmails(content);
@@ -102,17 +97,13 @@ public class Service{
 			final Node document = PARSER.parse(content);
 			/*
 			add this javascript code to manage `eml` elements:
-			var allElements = document.getElementsByClassName("eml");
-			for(var i = 0; i < allElements.length; i ++)
-				updateAnchor(allElements[i])
-			function updateAnchor(el){
-				el.href = 'mailto:' + decode(el.href);
-			}
+			for(var el of document.getElementsByClassName('eml'))
+				el.href = decode(el.href.split('/').pop());
 			function decode(encoded){
-				var decoded = "";
+				var decoded = '';
 				var key = parseInt(encoded.substr(0, 2), 16);
-				for(var n = 2; n < encoded.length; n += 2)
-					decoded += String.fromCharCode(parseInt(encoded.substr(n, 2), 16) ^ key);
+				for(var i = 2; i < encoded.length; i += 2)
+					decoded += String.fromCharCode(parseInt(encoded.substr(i, 2), 16) ^ key);
 				return decoded;
 			}
 			 */
@@ -152,7 +143,7 @@ public class Service{
 						{left: '\\\\begin{CD}', right: '\\\\end{CD}', display: true},
 						{left: '\\\\[', right: '\\\\]', display: true}
 					], throwOnError: false});"></script>
-					<script type="text/javascript">function b(e){e.href=c(e.href)}function c(d){var e="";var f=parseInt(d.substr(0, 2),16);for(var n=2;n<d.length;n+=2)e+=String.fromCharCode(parseInt(d.substr(n,2),16)^f);return e;}window.onload=function(){var a=document.getElementsByClassName('eml');for(var i=0;i<a.length;i++)b(a[i])}</script>
+					<script type="text/javascript">window.onload=function(){document.querySelectorAll('.eml').forEach(a=>{var p=a.href.split('/').pop().match(/.{2}/g).map(h=>parseInt(h,16));a.href=String.fromCharCode(...p.slice(1).map(x=>x^p[0]))})}</script>
 				</head>
 
 				<body class="stackedit">
@@ -164,11 +155,11 @@ public class Service{
 
 				</html>
 				""";
-			htmlBegin = htmlBegin.replaceFirst("\\$\\{title\\}", FileUtil.getNameOnly(file));
+			htmlBegin = htmlBegin.replace("${title}", FileUtil.getNameOnly(file));
 			final String html = RENDERER.render(document);
 
 			return htmlBegin
-				+ reinsertKaTeX(html, katexCodes)
+				+ reinsertKaTeXCode(html, katexCodes)
 				+ htmlEnd;
 		}
 	}
@@ -182,14 +173,14 @@ public class Service{
 		return katexCodes;
 	}
 
-	private static String replaceKaTeXWithPlaceholders(String input, final List<String> katexCodes){
+	private static String replaceKaTeXCodeWithPlaceholders(String input, final List<String> katexCodes){
 		final int size = katexCodes.size();
 		for(int i = 0; i < size; i ++)
 			input = input.replace(katexCodes.get(i), "[$$]{" + i + "}");
 		return input;
 	}
 
-	private static String reinsertKaTeX(String input, final List<String> katexCodes){
+	private static String reinsertKaTeXCode(String input, final List<String> katexCodes){
 		final int size = katexCodes.size();
 		for(int i = 0; i < size; i ++)
 			input = input.replace("[$$]{" + i + "}", katexCodes.get(i));

@@ -89,7 +89,7 @@ public class DragDropListener implements DropTargetListener{
 						for(final File file : files){
 							if(!FileUtil.getDotExtension(file).equals(".md")){
 								final JOptionPane outPane = new JOptionPane();
-								outPane.setMessage("Cannot process this type of file, only .md allowed");
+								outPane.setMessage("Cannot process this type of file (" + file.getName() + "), only .md allowed");
 								outPane.setMessageType(JOptionPane.WARNING_MESSAGE);
 								outPane.setOptionType(JOptionPane.DEFAULT_OPTION);
 								final JDialog dialog = outPane.createDialog(null, "Wrong input");

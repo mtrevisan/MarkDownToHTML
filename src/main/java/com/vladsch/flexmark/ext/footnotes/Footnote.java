@@ -20,6 +20,21 @@ public class Footnote extends Node implements DelimitedNode, DoNotDecorate, Link
 	protected int referenceOrdinal;
 
 
+	public Footnote(){}
+
+	public Footnote(final BasedSequence chars){
+		super(chars);
+	}
+
+	public Footnote(final BasedSequence openingMarker, final BasedSequence text, final BasedSequence closingMarker){
+		super(openingMarker.baseSubSequence(openingMarker.getStartOffset(), closingMarker.getEndOffset()));
+
+		this.openingMarker = openingMarker;
+		this.text = text;
+		this.closingMarker = closingMarker;
+	}
+
+
 	public int getReferenceOrdinal(){
 		return referenceOrdinal;
 	}
@@ -28,7 +43,6 @@ public class Footnote extends Node implements DelimitedNode, DoNotDecorate, Link
 		this.referenceOrdinal = referenceOrdinal;
 	}
 
-	@NotNull
 	@Override
 	public BasedSequence getReference(){
 		return text;
@@ -76,32 +90,17 @@ public class Footnote extends Node implements DelimitedNode, DoNotDecorate, Link
 		this.footnoteBlock = footnoteBlock;
 	}
 
-	@NotNull
 	@Override
 	public BasedSequence[] getSegments(){
 		return new BasedSequence[]{openingMarker, text, closingMarker};
 	}
 
 	@Override
-	public void getAstExtra(@NotNull final StringBuilder out){
+	public void getAstExtra(final StringBuilder out){
 		out.append(" ordinal: ")
 			.append(footnoteBlock != null? footnoteBlock.getFootnoteOrdinal(): 0)
 			.append(" ");
 		delimitedSegmentSpanChars(out, openingMarker, text, closingMarker, "text");
-	}
-
-	public Footnote(){}
-
-	public Footnote(final BasedSequence chars){
-		super(chars);
-	}
-
-	public Footnote(final BasedSequence openingMarker, final BasedSequence text, final BasedSequence closingMarker){
-		super(openingMarker.baseSubSequence(openingMarker.getStartOffset(), closingMarker.getEndOffset()));
-
-		this.openingMarker = openingMarker;
-		this.text = text;
-		this.closingMarker = closingMarker;
 	}
 
 	public BasedSequence getOpeningMarker(){

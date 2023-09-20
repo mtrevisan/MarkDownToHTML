@@ -48,8 +48,8 @@ public class FootnoteNodeRenderer implements PhasedNodeRenderer{
 	}
 
 	@Override
-	public void renderDocument(@NotNull final NodeRendererContext context, @NotNull final HtmlWriter html,
-			@NotNull final Document document, @NotNull final RenderingPhase phase){
+	public void renderDocument(final NodeRendererContext context, final HtmlWriter html,
+			final Document document, final RenderingPhase phase){
 		if(phase == RenderingPhase.BODY_TOP){
 			if(recheckUndefinedReferences){
 				//need to see if we have undefined footnotes that were defined after parsing
@@ -71,8 +71,7 @@ public class FootnoteNodeRenderer implements PhasedNodeRenderer{
 					this.footnoteRepository.resolveFootnoteOrdinals();
 			}
 		}
-
-		if(phase == RenderingPhase.BODY_BOTTOM){
+		else if(phase == RenderingPhase.BODY_BOTTOM){
 			//here we dump the footnote blocks that were referenced in the document body, i.e. ones with footnoteOrdinal > 0
 			if(!footnoteRepository.getReferencedFootnoteBlocks().isEmpty()){
 				html.attr("class", "footnotes").withAttr().tagIndent("div", () -> {
@@ -116,21 +115,22 @@ public class FootnoteNodeRenderer implements PhasedNodeRenderer{
 			final int footnoteOrdinal = footnoteBlock.getFootnoteOrdinal();
 			final int i = node.getReferenceOrdinal();
 			html.attr("id", "fnref-" + footnoteOrdinal + (i == 0? "": String.format(Locale.US, "-%d", i)));
-			html.srcPos(node.getChars()).withAttr().tag("sup", false, false, () -> {
-				if(!options.footnoteLinkRefClass.isEmpty())
-					html.attr("class", options.footnoteLinkRefClass);
-				html.attr("href", "#fn-" + footnoteOrdinal);
-				html.withAttr().tag("a");
-				html.raw(options.footnoteRefPrefix + footnoteOrdinal + options.footnoteRefSuffix);
-				html.tag("/a");
-			});
+			html.srcPos(node.getChars())
+				.withAttr()
+				.tag("sup", false, false, () -> {
+					if(!options.footnoteLinkRefClass.isEmpty())
+						html.attr("class", options.footnoteLinkRefClass);
+					html.attr("href", "#fn-" + footnoteOrdinal);
+					html.withAttr().tag("a");
+					html.raw(options.footnoteRefPrefix + footnoteOrdinal + options.footnoteRefSuffix);
+					html.tag("/a");
+				});
 		}
 	}
 
 	public static class Factory implements NodeRendererFactory{
-		@NotNull
 		@Override
-		public NodeRenderer apply(@NotNull final DataHolder options){
+		public NodeRenderer apply(final DataHolder options){
 			return new FootnoteNodeRenderer(options);
 		}
 	}
