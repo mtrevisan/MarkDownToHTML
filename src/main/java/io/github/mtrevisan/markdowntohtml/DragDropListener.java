@@ -77,7 +77,7 @@ public class DragDropListener implements DropTargetListener{
 					final List<File> files = (List<File>)transferable.getTransferData(flavor);
 
 					//ask for output directory
-					final String currentDir = (!files.isEmpty()? files.get(0).getParent(): "");
+					final String currentDir = (!files.isEmpty()? files.get(0).getParent(): ".");
 					final JFileChooser dirChooser = new JFileChooser();
 					//start at application current directory
 					dirChooser.setCurrentDirectory(new File(currentDir));
