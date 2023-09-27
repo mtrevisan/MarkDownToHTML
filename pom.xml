@@ -42,9 +42,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<java.version>1.17</java.version>
-		<maven.compiler.source>17</maven.compiler.source>
-		<maven.compiler.target>17</maven.compiler.target>
+		<java.version>1.21</java.version>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
 
 		<javadoc.html.version>-html5</javadoc.html.version>
 
@@ -310,8 +310,6 @@
 							<executable>${java.home}/bin/jlink.exe</executable>
 							<arguments>
 								<argument>--strip-debug</argument>
-								<argument>--compress</argument>
-								<argument>2</argument>
 								<argument>--no-header-files</argument>
 								<argument>--no-man-pages</argument>
 								<argument>--include-locales=${jvm.locales}</argument>
