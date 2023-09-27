@@ -125,6 +125,7 @@ public class Service{
 						img.separator-half{ max-height: 150px; }
 						img.copyright{ float:right; }
 						span.no-wrap{ white-space: nowrap; }
+						td{ page-break-inside: avoid; }
 						td.no-border{ border: 0; padding: 0; }
 					</style>
 
