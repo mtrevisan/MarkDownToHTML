@@ -109,12 +109,12 @@ public class Service{
 			<title>${title}</title>
 			<link rel="stylesheet" href="https://stackedit.io/style.css" />
 			<style>
-				._navigation-column { position: fixed; display: none; width: 250px; height: 100%; top: 0; left: 0; padding-left: 1.5em; text-indent:-1.5em; text-align: left; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; -ms-overflow-style: none; }
+				._navigation-column { position: fixed; display: none; width: 20%; height: 100%; top: 0; left: 0; padding-left: 1em; text-indent:-1.5em; text-align: left; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; -ms-overflow-style: none; }
 				._content-column { position: absolute; right: 0; top: 0; left: 0; }
-				._toc ul { padding: 0; }
-				._toc ul a { margin: .5rem 0; padding: .5rem 1rem; }
+				._toc ul { list-style-type: none; padding-left: 10px; }
+				._toc ul a { margin: .5rem 0; padding: .5rem 2rem; }
 				._toc ul ul { color: #888; font-size: .9em; }
-				._toc ul ul a { margin: 0; padding: .1rem 1rem; }
+				._toc ul ul a { margin: 0; padding: .1rem 2rem; }
 				._toc li { display: block; }
 				._toc a { display: block; color: inherit; text-decoration: none; }
 				._toc a:active, ._toc a:focus, ._toc a:hover { background-color: rgba(0, 0, 0, .075); border-radius: 3px; }
@@ -190,7 +190,7 @@ public class Service{
 
 				@media (min-width:1060px) {
 					._navigation-column { display: block; }
-					._content-column { left: 250px; }
+					._content-column { left: 20%; }
 				}
 				@page {
 					size: auto;
