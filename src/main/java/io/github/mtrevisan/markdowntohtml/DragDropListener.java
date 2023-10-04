@@ -98,7 +98,9 @@ public class DragDropListener implements DropTargetListener{
 								continue;
 							}
 
-							final String html = Service.convert(file);
+							final int result = JOptionPane.showConfirmDialog(null, "Generate TOC?", "Options", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+							final boolean generateTOC = (result == JOptionPane.YES_OPTION);
+							final String html = Service.convert(file, generateTOC);
 
 							//save output
 							final File outFile = new File(outFolder, FileUtil.getNameOnly(file) + ".html");
