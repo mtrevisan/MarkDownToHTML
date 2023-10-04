@@ -121,10 +121,13 @@ public class Service{
 							size: auto;
 							margin: {20mm 20mm 15mm 20mm};
 						}
+						img.center{ display: block; margin: auto; }
 						img.separator{ max-height: 300px; }
 						img.separator-half{ max-height: 150px; }
 						img.copyright{ float:right; }
 						span.no-wrap{ white-space: nowrap; }
+						div.center{ display: table; margin: auto; }
+						div.img-caption{ text-align: right; line-height: 3mm; font-size: x-small; }
 						td{ page-break-inside: avoid; }
 						td.no-border{ border: 0; padding: 0; }
 					</style>
