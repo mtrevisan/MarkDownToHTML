@@ -111,6 +111,8 @@ public class Service{
 			final List<String> katexCodes = extractKaTeXCode(content);
 			content = replaceKaTeXCodeWithPlaceholders(content, katexCodes);
 
+			final boolean hasDetailsTag = content.contains("<details");
+
 			//obfuscate emails
 			content = obfuscateEmails(content);
 
@@ -119,7 +121,7 @@ public class Service{
 
 			//replace placeholders:
 			final String filename = FileUtil.getNameOnly(file);
-			return replacePlaceholders(document, filename, generateTOC, katexCodes);
+			return replacePlaceholders(document, filename, generateTOC, hasDetailsTag, katexCodes);
 		}
 	}
 
@@ -244,11 +246,11 @@ public class Service{
 
 
 	private static String replacePlaceholders(final Node document, final String filename, final boolean generateTOC,
-			final List<String> katexCodes) throws IOException{
+			final boolean hasDetailsTag, final List<String> katexCodes) throws IOException{
 		final String htmlTemplate = getFileContentFromResource("html-template.html");
 		final String stylesheet = getFileContentFromResource("stylesheet.css");
 		final String katex = getFileContentFromResource("katex.html");
-		final String openDetailsWhenPrintingScript = (hasDetailsTag(document)
+		final String openDetailsWhenPrintingScript = (hasDetailsTag
 			? getFileContentFromResource("open-details-when-printing.html")
 			: "");
 		final String template = htmlTemplate
@@ -262,17 +264,6 @@ public class Service{
 			body = generateBodyWithTOC(document)
 				.replace("${content}", body);
 		return template.replace("${body}", body);
-	}
-
-	//TODO
-	private static boolean hasDetailsTag(final Node document){
-		final ReversiblePeekingIterator<Node> itr = document.getChildIterator();
-		while(itr.hasNext()){
-			final Node node = itr.next();
-			if(node.getClass() == Heading.class && ((Heading)node).getLevel() <= 2)
-				return true;
-		}
-		return false;
 	}
 
 }

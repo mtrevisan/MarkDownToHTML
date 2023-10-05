@@ -1,22 +1,20 @@
 <script type="text/javascript">
     //open closed details elements for printing
     window.addEventListener('beforeprint', () => {
-        const allDetails = document.body.querySelectorAll('details');
-        for(let i = 0; i < allDetails.length; i ++){
-            if(allDetails[i].open)
-                allDetails[i].dataset.open = 'true';
+        document.querySelectorAll('details').forEach(detail => {
+            if(detail.open)
+                detail.dataset.open = 'true';
             else
-                allDetails[i].setAttribute('open', '');
-        }
+                detail.setAttribute('open', '');
+		  });
     });
     //after printing close details elements not opened before
     window.addEventListener('afterprint', () => {
-        const allDetails = document.body.querySelectorAll('details');
-        for(let i = 0; i < allDetails.length; i ++){
-            if(allDetails[i].dataset.open)
-                allDetails[i].dataset.open = '';
+        document.querySelectorAll('details').forEach(detail => {
+            if(detail.dataset.open)
+                detail.dataset.open = '';
             else
-                allDetails[i].removeAttribute('open');
-        }
+                detail.removeAttribute('open');
+		  });
     });
 </script>
