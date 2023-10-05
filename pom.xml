@@ -420,6 +420,10 @@
 					<groupId>com.vladsch.flexmark</groupId>
 					<artifactId>flexmark-java</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.vladsch.flexmark</groupId>
+					<artifactId>flexmark-ext-attributes</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 	</dependencies>

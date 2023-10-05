@@ -1,42 +1,21 @@
-package com.vladsch.flexmark.ext.highlight;
+package com.vladsch.flexmark.ext.attributes;
 
 import com.vladsch.flexmark.util.ast.DelimitedNode;
+import com.vladsch.flexmark.util.ast.DoNotDecorate;
 import com.vladsch.flexmark.util.ast.Node;
+import com.vladsch.flexmark.util.ast.NonRenderingInline;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
 
 
 /**
- * A Highlight node
- *
- * @see <a href="https://github.com/vsch/flexmark-java/pull/594">Pull request 594</a>
+ * A AttributesNode node
  */
-public class Highlight extends Node implements DelimitedNode{
+public class AttributesNode extends Node implements DelimitedNode, DoNotDecorate, NonRenderingInline{
 
 	protected BasedSequence openingMarker = BasedSequence.NULL;
 	protected BasedSequence text = BasedSequence.NULL;
 	protected BasedSequence closingMarker = BasedSequence.NULL;
-	protected String highlightBlockText;
 
-
-	public Highlight(){}
-
-	public Highlight(final BasedSequence chars){
-		super(chars);
-	}
-
-	public Highlight(final BasedSequence openingMarker, final BasedSequence text, final BasedSequence closingMarker){
-		super(openingMarker.baseSubSequence(openingMarker.getStartOffset(), closingMarker.getEndOffset()));
-
-		this.openingMarker = openingMarker;
-		this.text = text;
-		this.closingMarker = closingMarker;
-	}
-
-	public Highlight(final BasedSequence chars, final String highlightBlockText){
-		super(chars);
-
-		this.highlightBlockText = highlightBlockText;
-	}
 
 	@Override
 	public BasedSequence[] getSegments(){
@@ -47,6 +26,24 @@ public class Highlight extends Node implements DelimitedNode{
 	@Override
 	public void getAstExtra(final StringBuilder out){
 		delimitedSegmentSpanChars(out, openingMarker, text, closingMarker, "text");
+	}
+
+	public AttributesNode(){}
+
+	public AttributesNode(final BasedSequence chars){
+		super(chars);
+	}
+
+	public AttributesNode(final BasedSequence openingMarker, final BasedSequence text, final BasedSequence closingMarker){
+		super(openingMarker.baseSubSequence(openingMarker.getStartOffset(), closingMarker.getEndOffset()));
+
+		this.openingMarker = openingMarker;
+		this.text = text;
+		this.closingMarker = closingMarker;
+	}
+
+	public AttributesNode(final BasedSequence chars, final String attributesBlockText){
+		super(chars);
 	}
 
 	public BasedSequence getOpeningMarker(){
