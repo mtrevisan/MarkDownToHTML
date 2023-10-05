@@ -248,16 +248,31 @@ public class Service{
 		final String htmlTemplate = getFileContentFromResource("html-template.html");
 		final String stylesheet = getFileContentFromResource("stylesheet.css");
 		final String katex = getFileContentFromResource("katex.html");
+		final String openDetailsWhenPrintingScript = (hasDetailsTag(document)
+			? getFileContentFromResource("open-details-when-printing.html")
+			: "");
 		final String template = htmlTemplate
 			.replace("${title}", filename)
 			.replace("${stylesheet}", stylesheet)
-			.replace("${katex}", katex);
+			.replace("${katex}", katex)
+			.replace("${scripts}", openDetailsWhenPrintingScript);
 		final String html = RENDERER.render(document);
 		String body = reinsertKaTeXCode(html, katexCodes);
 		if(generateTOC)
 			body = generateBodyWithTOC(document)
 				.replace("${content}", body);
 		return template.replace("${body}", body);
+	}
+
+	//TODO
+	private static boolean hasDetailsTag(final Node document){
+		final ReversiblePeekingIterator<Node> itr = document.getChildIterator();
+		while(itr.hasNext()){
+			final Node node = itr.next();
+			if(node.getClass() == Heading.class && ((Heading)node).getLevel() <= 2)
+				return true;
+		}
+		return false;
 	}
 
 }
