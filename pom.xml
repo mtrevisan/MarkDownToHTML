@@ -402,6 +402,10 @@
 				<filtering>true</filtering>
 				<targetPath>${project.build.directory}/packaging</targetPath>
 			</resource>
+			<resource>
+				<directory>${project.basedir}/src/main/resources</directory>
+				<targetPath>/resources</targetPath>
+			</resource>
 		</resources>
 	</build>
 
