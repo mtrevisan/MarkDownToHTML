@@ -35,7 +35,6 @@ import com.vladsch.flexmark.util.ast.KeepType;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.collection.iteration.ReversiblePeekingIterator;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-import com.vladsch.flexmark.util.misc.FileUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -45,9 +44,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -59,6 +62,8 @@ public class Service{
 
 	private static final Pattern KATEX_PATTERN = Pattern.compile("(?:^|[^\\\\])(\\$\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$\\$|\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$)",
 		Pattern.MULTILINE | Pattern.UNICODE_CASE);
+
+	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
 
 
 	private static final Parser PARSER;
@@ -102,7 +107,7 @@ public class Service{
 	*/
 
 
-	public static String convert(final File file, final boolean generateTOC) throws IOException{
+	public static String convert(final File file, final boolean generateTOC, final boolean preventCopying) throws IOException{
 		try(final BufferedReader r = getBufferedReader(file)){
 			String content = r.lines()
 				.collect(Collectors.joining("\n"));
@@ -120,8 +125,7 @@ public class Service{
 			final Node document = PARSER.parse(content);
 
 			//replace placeholders:
-			final String filename = FileUtil.getNameOnly(file);
-			return replacePlaceholders(document, filename, generateTOC, hasDetailsTag, katexCodes);
+			return replacePlaceholders(document, file, generateTOC, hasDetailsTag, preventCopying, katexCodes);
 		}
 	}
 
@@ -245,25 +249,56 @@ public class Service{
 	}
 
 
-	private static String replacePlaceholders(final Node document, final String filename, final boolean generateTOC,
-			final boolean hasDetailsTag, final List<String> katexCodes) throws IOException{
-		final String htmlTemplate = getFileContentFromResource("html-template.html");
+	private static String replacePlaceholders(final Node document, final File file, final boolean generateTOC,
+			final boolean hasDetailsTag, final boolean preventCopying, final List<String> katexCodes) throws IOException{
+		String htmlTemplate = getFileContentFromResource("html-template.html");
+
+		final Properties properties = loadProperties(file);
+		final Set<String> keys = properties.stringPropertyNames();
+		for(final String key : keys){
+			final String value = properties.getProperty(key);
+
+			htmlTemplate = htmlTemplate.replace("${" + key + "}", value);
+		}
+		htmlTemplate = htmlTemplate.replace("${modified-datetime}", DATE_TIME_FORMATTER.format(ZonedDateTime.now()));
+
+
 		final String stylesheet = getFileContentFromResource("stylesheet.css");
 		final String katex = getFileContentFromResource("katex.html");
 		final String openDetailsWhenPrintingScript = (hasDetailsTag
 			? getFileContentFromResource("open-details-when-printing.html")
 			: "");
-		final String template = htmlTemplate
-			.replace("${title}", filename)
-			.replace("${stylesheet}", stylesheet)
+		final String preventCopyingScript = (preventCopying
+			? getFileContentFromResource("prevent-copying.html")
+			: "");
+		final String preventCopyingCSS = (preventCopying
+			? getFileContentFromResource("prevent-copying.css")
+			: "");
+		htmlTemplate = htmlTemplate
+			.replace("${stylesheet}", stylesheet + preventCopyingCSS)
 			.replace("${katex}", katex)
-			.replace("${scripts}", openDetailsWhenPrintingScript);
+			.replace("${scripts}", openDetailsWhenPrintingScript + preventCopyingScript);
 		final String html = RENDERER.render(document);
 		String body = reinsertKaTeXCode(html, katexCodes);
 		if(generateTOC)
 			body = generateBodyWithTOC(document)
 				.replace("${content}", body);
-		return template.replace("${body}", body);
+		final String bodyTagBegin = (preventCopying
+			? "<body class=\"_content _justify _no-hyphens\" inert>\n"
+			: "<body class=\"_content _justify _no-hyphens\">\n");
+		final String bodyTagEnd = "\n</body>";
+		return htmlTemplate.replace("${body}", bodyTagBegin + body + bodyTagEnd);
+	}
+
+	private static Properties loadProperties(final File file){
+		final Properties properties = new Properties();
+		final String filename = file.getAbsolutePath()
+			.replaceFirst("\\.[^.]+$", ".properties");
+		try(final FileInputStream fileInputStream = new FileInputStream(filename)){
+			properties.load(fileInputStream);
+		}
+		catch(final IOException ignored){}
+		return properties;
 	}
 
 }

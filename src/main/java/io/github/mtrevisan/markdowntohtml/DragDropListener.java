@@ -28,7 +28,9 @@ import com.vladsch.flexmark.util.misc.FileUtil;
 
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import java.awt.Dimension;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -44,6 +46,13 @@ import java.util.List;
 
 
 public class DragDropListener implements DropTargetListener{
+
+	private final JFrame parent;
+
+
+	public DragDropListener(final JFrame parent){
+		this.parent = parent;
+	}
 
 	@Override
 	public void dragEnter(final DropTargetDragEvent event){}
@@ -98,9 +107,13 @@ public class DragDropListener implements DropTargetListener{
 								continue;
 							}
 
-							final int result = JOptionPane.showConfirmDialog(null, "Generate TOC?", "Options", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-							final boolean generateTOC = (result == JOptionPane.YES_OPTION);
-							final String html = Service.convert(file, generateTOC);
+							final ConfigurationDialog configurationDialog = new ConfigurationDialog(parent);
+							configurationDialog.setMinimumSize(new Dimension(170, 100));
+							configurationDialog.setVisible(true);
+							final boolean generateTOC = configurationDialog.isGenerateTOC();
+							final boolean preventCopying = configurationDialog.isPreventCopying();
+
+							final String html = Service.convert(file, generateTOC, preventCopying);
 
 							//save output
 							final File outFile = new File(outFolder, FileUtil.getNameOnly(file) + ".html");
@@ -111,8 +124,8 @@ public class DragDropListener implements DropTargetListener{
 								outPane.setMessage("Output saved");
 								outPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
 								outPane.setOptionType(JOptionPane.DEFAULT_OPTION);
-								final JDialog dialog = outPane.createDialog(null, "Processing result");
-								dialog.setVisible(true);
+								final JDialog resultDialog = outPane.createDialog(null, "Processing result");
+								resultDialog.setVisible(true);
 							}
 							catch(final IOException e){
 								e.printStackTrace();

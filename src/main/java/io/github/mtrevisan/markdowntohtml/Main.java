@@ -61,7 +61,7 @@ public class Main{
 			frame.setSize(400, 300);
 
 			//create the drag and drop listener
-			final DragDropListener dragDropListener = new DragDropListener();
+			final DragDropListener dragDropListener = new DragDropListener(frame);
 
 			//connect the label with a drag and drop listener
 			JLabel dragLabel = new JLabel("Drag markdown file here!", SwingConstants.CENTER);
