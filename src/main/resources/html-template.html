@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>${title}</title>
@@ -20,8 +21,12 @@
     <meta property="og:description" content="${social-description}" />
     <meta property="og:image" content="${social-image}" />
     <meta property="og:image:secure_url" content="${social-image}" />
+    <meta property="og:image:type" content="${social-image-mimetype}" />
     <meta property="og:image:width" content="${social-image-width}" />
     <meta property="og:image:height" content="${social-image-height}" />
+    <meta property="og:image:alt" content="${title}" />
+    <meta property="og:updated_time" content="${modified-datetime}" />
+    <meta property="article:author" content="${author}" />
     <meta property="article:published_time" content="${published-datetime}" />
     <meta property="article:modified_time" content="${modified-datetime}" />
 
@@ -29,6 +34,11 @@
     <meta name="twitter:title" content="${social-title}" />
     <meta name="twitter:description" content="${social-description}" />
     <meta name="twitter:image" content="${social-image}" />
+    <meta name="twitter:image:alt" content="${title}" />
+    <meta name="twitter:label1" content="Scritto da" />
+    <meta name="twitter:data1" content="${author}" />
+    <meta name="twitter:label2" content="Tempo di lettura stimato" />
+    <meta name="twitter:data2" content="${social-reading-time}" />
 
     <style>
         ${stylesheet}

@@ -38,14 +38,15 @@
 
 ._navigation-column { position: fixed; display: none; width: 20%; height: 100%; top: 0; left: 0; padding-left: 1em; text-indent: -1.5em; text-align: left; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; -ms-overflow-style: none; }
 ._content-column { position: absolute; right: 0; top: 0; left: 0; }
-._toc ul, ._toc menu { list-style-type: none; padding-left: 10px; }
-._toc ul a, ._toc menu a { margin: .5rem 0; padding: .5rem 2rem; }
-._toc ul ul, ._toc menu menu { color: #888; font-size: .9em; }
-._toc ul ul a, ._toc menu menu a { margin: 0; padding: .1rem 2rem; }
-._toc li { display: block; }
-._toc a { display: block; color: inherit; text-decoration: none; }
-._toc a:active, ._toc a:focus, ._toc a:hover { background-color: rgba(0, 0, 0, .075); border-radius: 3px; }
-html[data-darkreader-scheme="dark"] ._toc a:active, html[data-darkreader-scheme="dark"] ._toc a:focus, html[data-darkreader-scheme="dark"] ._toc a:hover { background-color: rgba(0, 0, 0, .6); border-radius: 3px; }
+._navigation-column ul, ._navigation-column menu { list-style-type: none; padding-left: 10px; }
+._navigation-column ul a, ._navigation-column menu a { margin: .5rem 0; padding: .5rem 2rem; }
+._navigation-column ul ul, ._navigation-column menu menu { color: #888; font-size: .9em; }
+._navigation-column ul ul a, ._navigation-column menu menu a { margin: 0; padding: .1rem 2rem; }
+._navigation-column li { display: block; }
+._navigation-column li rt { display: none; }
+._navigation-column a { display: block; color: inherit; text-decoration: none; }
+._navigation-column a:active, ._navigation-column a:focus, ._navigation-column a:hover { background-color: rgba(0, 0, 0, .075); border-radius: 3px; }
+html[data-darkreader-scheme="dark"] ._navigation-column a:active, html[data-darkreader-scheme="dark"] ._navigation-column a:focus, html[data-darkreader-scheme="dark"] ._navigation-column a:hover { background-color: rgba(0, 0, 0, .6); border-radius: 3px; }
 
 body, html { color: rgba(0, 0, 0, .75); font-size: 16px; font-family: Lato, Helvetica Neue, Helvetica, sans-serif; font-variant-ligatures: common-ligatures; line-height: 1.67; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 html { line-height: 1.5; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; }
@@ -87,6 +88,7 @@ blockquote, dl, ol, p, pre, ul { margin: 1.2em 0; }
 h1, h2, h3, h4, h5, h6 { margin: 1.8em 0; line-height: 1.33; }
 h1:after, h2:after { content: ""; display: block; position: relative; top: .33em; border-bottom: 1px solid hsla(0, 0%, 50%, .33); }
 h1 { font-size: 2em; margin: .67em 0; }
+h1 rt { font-size: small; }
 hr { border: 0; border-top: 1px solid hsla(0, 0%, 50%, .33); margin: 2em 0; box-sizing: content-box; height: 0; overflow: visible; }
 pre { font-family: monospace, monospace; font-size: 1em; }
 abbr[title] { border-bottom: none; text-decoration: underline dotted; cursor: help; }
