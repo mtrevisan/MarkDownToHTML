@@ -27,7 +27,6 @@ package io.github.mtrevisan.markdowntohtml;
 import com.vladsch.flexmark.util.misc.FileUtil;
 
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import java.awt.Dimension;
@@ -85,54 +84,47 @@ public class DragDropListener implements DropTargetListener{
 					@SuppressWarnings("unchecked")
 					final List<File> files = (List<File>)transferable.getTransferData(flavor);
 
-					//ask for output directory
+					//output directory
 					final String currentDir = (!files.isEmpty()? files.get(0).getParent(): ".");
-					final JFileChooser dirChooser = new JFileChooser();
-					//start at application current directory
-					dirChooser.setCurrentDirectory(new File(currentDir));
-					dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-					final int opt = dirChooser.showSaveDialog(null);
-					final File outFolder = (opt == JFileChooser.APPROVE_OPTION? dirChooser.getSelectedFile(): null);
+					final File outFolder = new File(currentDir);
 
-					if(outFolder != null){
-						for(final File file : files){
-							if(!FileUtil.getDotExtension(file).equals(".md")){
-								final JOptionPane outPane = new JOptionPane();
-								outPane.setMessage("Cannot process this type of file (" + file.getName() + "), only .md allowed");
-								outPane.setMessageType(JOptionPane.WARNING_MESSAGE);
-								outPane.setOptionType(JOptionPane.DEFAULT_OPTION);
-								final JDialog dialog = outPane.createDialog(null, "Wrong input");
-								dialog.setVisible(true);
-
-								continue;
-							}
-
-							final ConfigurationDialog configurationDialog = new ConfigurationDialog(parent);
-							configurationDialog.setMinimumSize(new Dimension(170, 100));
-							configurationDialog.setVisible(true);
-							final boolean generateTOC = configurationDialog.isGenerateTOC();
-							final boolean preventCopying = configurationDialog.isPreventCopying();
-
-							final String html = Service.convert(file, generateTOC, preventCopying);
-
+					for(final File file : files){
+						if(!FileUtil.getDotExtension(file).equals(".md")){
 							final JOptionPane outPane = new JOptionPane();
-							outPane.setMessage("Output saved");
-							outPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
+							outPane.setMessage("Cannot process this type of file (" + file.getName() + "), only .md allowed");
+							outPane.setMessageType(JOptionPane.WARNING_MESSAGE);
 							outPane.setOptionType(JOptionPane.DEFAULT_OPTION);
-							//save output
-							final File outFile = new File(outFolder, FileUtil.getNameOnly(file) + ".html");
-							try(final FileWriter writer = new FileWriter(outFile, StandardCharsets.UTF_8)){
-								writer.write(html);
-							}
-							catch(final IOException e){
-								e.printStackTrace();
+							final JDialog dialog = outPane.createDialog(null, "Wrong input");
+							dialog.setVisible(true);
 
-								outPane.setMessage("Processing error");
-								outPane.setMessageType(JOptionPane.ERROR_MESSAGE);
-							}
-							final JDialog resultDialog = outPane.createDialog(null, "Processing result");
-							resultDialog.setVisible(true);
+							continue;
 						}
+
+						final ConfigurationDialog configurationDialog = new ConfigurationDialog(parent);
+						configurationDialog.setMinimumSize(new Dimension(170, 100));
+						configurationDialog.setVisible(true);
+						final boolean generateTOC = configurationDialog.isGenerateTOC();
+						final boolean preventCopying = configurationDialog.isPreventCopying();
+
+						final String html = Service.convert(file, generateTOC, preventCopying);
+
+						final JOptionPane outPane = new JOptionPane();
+						outPane.setMessage("Output saved");
+						outPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
+						outPane.setOptionType(JOptionPane.DEFAULT_OPTION);
+						//save output
+						final File outFile = new File(outFolder, FileUtil.getNameOnly(file) + ".html");
+						try(final FileWriter writer = new FileWriter(outFile, StandardCharsets.UTF_8)){
+							writer.write(html);
+						}
+						catch(final IOException e){
+							e.printStackTrace();
+
+							outPane.setMessage("Processing error");
+							outPane.setMessageType(JOptionPane.ERROR_MESSAGE);
+						}
+						final JDialog resultDialog = outPane.createDialog(null, "Processing result");
+						resultDialog.setVisible(true);
 					}
 				}
 			}
