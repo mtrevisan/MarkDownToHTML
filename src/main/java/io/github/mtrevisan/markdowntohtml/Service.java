@@ -283,11 +283,7 @@ public class Service{
 		if(generateTOC)
 			body = generateBodyWithTOC(document)
 				.replace("${content}", body);
-		final String bodyTagBegin = (preventCopying
-			? "<body class=\"_content _justify _no-hyphens\" inert>\n"
-			: "<body class=\"_content _justify _no-hyphens\">\n");
-		final String bodyTagEnd = "\n</body>";
-		return htmlTemplate.replace("${body}", bodyTagBegin + body + bodyTagEnd);
+		return htmlTemplate.replace("${body}", body);
 	}
 
 	private static Properties loadProperties(final File file){
