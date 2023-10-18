@@ -89,6 +89,14 @@
 		<!-- Flexmark -->
 		<!-- https://mvnrepository.com/artifact/com.vladsch.flexmark/flexmark-all -->
 		<vladsch.flexmark.version>0.64.8</vladsch.flexmark.version>
+
+		<!-- Apache -->
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-text -->
+		<apache.commons.text.version>1.10.0</apache.commons.text.version>
+
+		<!-- JSoup -->
+		<!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
+		<jsoup.version>1.16.1</jsoup.version>
 	</properties>
 
 	<profiles>
@@ -425,6 +433,20 @@
 					<artifactId>flexmark-ext-attributes</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<!-- Apache -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>${apache.commons.text.version}</version>
+		</dependency>
+
+		<!-- JSoup -->
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>${jsoup.version}</version>
 		</dependency>
 	</dependencies>
 

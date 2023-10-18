@@ -35,6 +35,11 @@ import com.vladsch.flexmark.util.ast.KeepType;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.collection.iteration.ReversiblePeekingIterator;
 import com.vladsch.flexmark.util.data.MutableDataSet;
+import org.apache.commons.text.StringEscapeUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -46,7 +51,9 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -71,7 +78,10 @@ public class Service{
 	static{
 		final MutableDataSet options = new MutableDataSet()
 			.set(Parser.REFERENCES_KEEP, KeepType.LAST)
-			.set(Parser.EXTENSIONS, List.of(TablesExtension.create(), TypographicExtension.create(), SubscriptExtension.create(),
+			.set(Parser.EXTENSIONS, List.of(
+				TablesExtension.create(),
+				TypographicExtension.create(),
+				SubscriptExtension.create(),
 				FootnoteExtension.create()))
 
 			.set(HtmlRenderer.INDENT_SIZE, 3)
@@ -121,11 +131,16 @@ public class Service{
 			//obfuscate emails
 			content = obfuscateEmails(content);
 
+			//escape HTML entities
+//			content = escapeHTMLEntities(content);
+
 			//generate AST
-			final Node document = PARSER.parse(content);
+			Node document = PARSER.parse(content);
 
 			//replace placeholders:
-			return replacePlaceholders(document, file, generateTOC, hasDetailsTag, preventCopying, katexCodes);
+			content = replacePlaceholders(document, file, generateTOC, hasDetailsTag, preventCopying, katexCodes);
+
+			return content;
 		}
 	}
 
@@ -248,6 +263,32 @@ public class Service{
 		return (hex.length() < 2? "0" + hex: hex);
 	}
 
+
+	private static String escapeHTMLEntities(final String content){
+		//parse HTML
+		final Document document = Jsoup.parse(content);
+
+		//collect children
+		final Deque<Element> stack = new ArrayDeque<>();
+		stack.push(document.body());
+		while(!stack.isEmpty()){
+			final Element elem = stack.pop();
+			if(elem.childrenSize() > 0){
+				final Elements children = elem.children();
+				for(int j = 0; j < children.size(); j ++)
+					stack.push(children.get(j));
+			}
+			else{
+				final String escapedText = StringEscapeUtils.escapeHtml4(elem.text());
+				elem.text(escapedText + "\r\n");
+			}
+
+			elem.attr("alt", StringEscapeUtils.escapeHtml4(elem.attr("alt")));
+			elem.attr("title", StringEscapeUtils.escapeHtml4(elem.attr("title")));
+		}
+
+		return document.toString();
+	}
 
 	private static String replacePlaceholders(final Node document, final File file, final boolean generateTOC,
 			final boolean hasDetailsTag, final boolean preventCopying, final List<String> katexCodes) throws IOException{
