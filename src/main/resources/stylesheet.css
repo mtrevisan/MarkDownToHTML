@@ -54,6 +54,9 @@ body { counter-reset: katexEqnNo mmlEqnNo; }
 ._content { margin: 0 auto 0 auto; padding-left: 30px; padding-right: 30px; max-width: 750px; }
 ._justify { text-align: justify; }
 ._no-hyphens { hyphens: none; }
+span._uncia { display: inline-flex; }
+span._uncia span:nth-child(even) { margin-left: 0.6mm; }
+span._uncia > span > span { display: grid; line-height: 1mm; }
 
 article, aside, footer, header, nav, section, main, details, menu { display: block; }
 figure { display: inline-flex; flex-flow: column; margin: auto; }
