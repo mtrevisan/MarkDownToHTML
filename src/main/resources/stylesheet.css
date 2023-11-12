@@ -58,6 +58,8 @@ span._uncia { display: inline-flex; }
 span._uncia span:nth-child(even) { margin-left: 0.1em; }
 span._uncia > span { margin-right: -0.6em; }
 span._uncia > span > span { display: grid; line-height: 1mm; }
+span._no-wrap { white-space: nowrap; }
+span._space_before:before { content: "\00a0"; }
 
 article, aside, footer, header, nav, section, main, details, menu { display: block; }
 figure { display: inline-flex; flex-flow: column; margin: auto; }
@@ -95,7 +97,7 @@ h1 { font-size: 2em; margin: .67em 0; }
 h1 rt { font-size: small; }
 hr { border: 0; border-top: 1px solid hsla(0, 0%, 50%, .33); margin: 2em 0; box-sizing: content-box; height: 0; overflow: visible; }
 pre { font-family: monospace, monospace; font-size: 1em; }
-abbr[title] { border-bottom: none; text-decoration: underline dotted; cursor: help; }
+abbr[title] { border-bottom: none; text-decoration: underline dotted; text-decoration-thickness: from-font; cursor: help; }
 dfn { font-style: italic; }
 mark { background-color: #f8f840; color: #000; }
 b, strong { font-weight: bolder; }
@@ -114,7 +116,6 @@ td, th { border-right: 1px solid #dcdcdc; padding: 8px 12px; page-break-inside: 
 td:last-child, th:last-child { border-right: 0; }
 td { border-top: 1px solid #dcdcdc; }
 td._no-border { border: 0; padding: 0; }
-span._no-wrap { white-space: nowrap; }
 textarea { overflow: auto; }
 summary { display: list-item; }
 canvas { display: inline-block; }
