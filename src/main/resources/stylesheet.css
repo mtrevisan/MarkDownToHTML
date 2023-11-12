@@ -133,14 +133,25 @@ blockquote { color: rgba(0, 0, 0, .5); padding-left: 1.5em; border-left: 5px sol
 	._navigation-column { display: block; }
 	._content-column { left: 20%; }
 }
+@media (hover: none), print {
+	abbr[title] { text-decoration: none; }
+	dfn > abbr[title]::after {
+		content : ' [' attr(title) ']';
+		font-size: 75%;
+		line-height: 0;
+		position: relative;
+		vertical-align: baseline;
+		top: -0.5em;
+	}
+}
 @media print {
-    @page {
-        size: auto;
-        margin: 20mm 20mm 15mm 20mm;
-    }
-    summary { list-style: none; }
-    summary::-webkit-details-marker { display: none; }
-    ._copyright-protection { display: none; }
-    ._navigation-column { display: none; }
-    ._content-column { left: 0; }
+	@page {
+		size: auto;
+		margin: 20mm 20mm 15mm 20mm;
+	}
+	summary { list-style: none; }
+	summary::-webkit-details-marker { display: none; }
+	._copyright-protection { display: none; }
+	._navigation-column { display: none; }
+	._content-column { left: 0; }
 }
