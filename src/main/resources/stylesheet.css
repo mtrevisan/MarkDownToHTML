@@ -111,7 +111,7 @@ ol ol, ol ul, ul ol, ul ul { margin: 0; }
 a { color: #0c93e4; background-color: transparent; -webkit-text-decoration-skip: objects; text-decoration: underline; }
 a.italic-link { font-style: italic; }
 a:focus, a:hover { text-decoration: none; }
-table { background-color: transparent; border-collapse: collapse; border-spacing: 0; font-size: small; }
+table { background-color: transparent; border-collapse: collapse; border-spacing: 0; }
 td, th { border-right: 1px solid #dcdcdc; padding: 8px 12px; page-break-inside: avoid; }
 td:last-child, th:last-child { border-right: 0; }
 td { border-top: 1px solid #dcdcdc; }
