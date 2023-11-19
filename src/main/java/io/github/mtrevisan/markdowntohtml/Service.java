@@ -43,6 +43,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -290,8 +291,8 @@ public class Service{
 		final Properties properties = new Properties();
 		final String filename = file.getAbsolutePath()
 			.replaceFirst("\\.[^.]+$", ".properties");
-		try(final FileInputStream fileInputStream = new FileInputStream(filename)){
-			properties.load(fileInputStream);
+		try(final Reader in = new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8)){
+			properties.load(in);
 		}
 		catch(final IOException ignored){}
 		return properties;
