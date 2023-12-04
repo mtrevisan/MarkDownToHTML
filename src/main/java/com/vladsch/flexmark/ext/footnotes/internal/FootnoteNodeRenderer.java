@@ -80,7 +80,6 @@ public class FootnoteNodeRenderer implements PhasedNodeRenderer{
 			//here we dump the footnote blocks that were referenced in the document body, i.e. ones with footnoteOrdinal > 0
 			if(!footnoteRepository.getReferencedFootnoteBlocks().isEmpty()){
 				html.attr("class", "footnotes").withAttr().tagIndent("div", () -> {
-					html.tagVoidLine("hr");
 					html.tagIndent("ol", () -> {
 						for(final FootnoteBlock footnoteBlock : footnoteRepository.getReferencedFootnoteBlocks()){
 							final int footnoteOrdinal = footnoteBlock.getFootnoteOrdinal();
