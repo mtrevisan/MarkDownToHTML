@@ -41,7 +41,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class DragDropListener implements DropTargetListener{
@@ -105,6 +108,15 @@ public class DragDropListener implements DropTargetListener{
 						configurationDialog.setVisible(true);
 						final boolean generateTOC = configurationDialog.isGenerateTOC();
 						final boolean preventCopying = configurationDialog.isPreventCopying();
+
+						final List<String> ids = Service.extractIDs(file);
+						final HashSet<String> uniqueIDs = new HashSet<>();
+						final Set<String> duplicatedIDs = ids.stream()
+							.filter(e -> !uniqueIDs.add(e))
+							.collect(Collectors.toSet());
+						if(!duplicatedIDs.isEmpty())
+							JOptionPane.showMessageDialog(null, "There are duplicated IDs: " + duplicatedIDs,
+								"Duplicated IDs found", JOptionPane.INFORMATION_MESSAGE);
 
 						final String html = Service.convert(file, generateTOC, preventCopying);
 

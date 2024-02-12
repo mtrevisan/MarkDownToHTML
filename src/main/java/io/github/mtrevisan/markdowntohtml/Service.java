@@ -36,6 +36,7 @@ import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.collection.iteration.ReversiblePeekingIterator;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 
+import javax.swing.JOptionPane;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,6 +49,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -61,6 +63,8 @@ public class Service{
 
 	private static final Random RANDOM = new Random();
 
+	private static final Pattern ID_PATTERN = Pattern.compile("id\\s*=\\s*\"([^\"]*?)\"",
+		Pattern.MULTILINE | Pattern.UNICODE_CASE);
 	private static final Pattern KATEX_PATTERN = Pattern.compile("(?:^|[^\\\\])(\\$\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$\\$|\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$)",
 		Pattern.MULTILINE | Pattern.UNICODE_CASE);
 
@@ -108,6 +112,24 @@ public class Service{
 	*/
 
 
+	public static List<String> extractIDs(final File file) throws IOException{
+		try(final BufferedReader r = getBufferedReader(file)){
+			final String content = r.lines()
+				.collect(Collectors.joining("\n"));
+
+			return extractIDs(content);
+		}
+	}
+
+	/**
+	 * Converts the content of a file to HTML with optional features.
+	 *
+	 * @param file	The file to be converted.
+	 * @param generateTOC	Flag indicating whether to generate a table of contents.
+	 * @param preventCopying	Flag indicating whether to prevent text copying in the generated HTML.
+	 * @return	The converted content as HTML.
+	 * @throws IOException	If an I/O error occurs while reading the file or loading resources.
+	 */
 	public static String convert(final File file, final boolean generateTOC, final boolean preventCopying) throws IOException{
 		try(final BufferedReader r = getBufferedReader(file)){
 			String content = r.lines()
@@ -130,10 +152,24 @@ public class Service{
 		}
 	}
 
+	/**
+	 * Returns a BufferedReader for reading the contents of a file.
+	 *
+	 * @param file	The file to be read.
+	 * @return BufferedReader	for reading the file contents.
+	 * @throws FileNotFoundException	If the file does not exist or cannot be opened for reading.
+	 */
 	private static BufferedReader getBufferedReader(final File file) throws FileNotFoundException{
 		return new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
 	}
 
+	/**
+	 * Generates the body of an HTML document with a table of contents (TOC).
+	 *
+	 * @param document	The root node of the document.
+	 * @return	The generated HTML body with the table of contents or "${content}" if no section headings are found.
+	 * @throws IOException	If an I/O error occurs while reading the file or loading resources.
+	 */
 	private static String generateBodyWithTOC(final Node document) throws IOException{
 		//extract list of h1 and h2
 		final List<Heading> sectionHeadings = extractSectionHeadings(document, 2);
@@ -162,6 +198,13 @@ public class Service{
 		return "${content}";
 	}
 
+	/**
+	 * Extracts the section headings from a document up to a specified maximum level.
+	 *
+	 * @param document	The root node of the document.
+	 * @param maxLevel	The maximum level of headings to extract.
+	 * @return	A list of {@link Heading} objects representing the extracted section headings.
+	 */
 	private static List<Heading> extractSectionHeadings(final Node document, final int maxLevel){
 		final List<Heading> sectionHeadings = new ArrayList<>();
 		final ReversiblePeekingIterator<Node> itr = document.getChildIterator();
@@ -174,6 +217,13 @@ public class Service{
 	}
 
 
+	/**
+	 * Reads the content of a file from a resource in the classpath.
+	 *
+	 * @param filename	The filename of the resource to read.
+	 * @return	The string content of the file.
+	 * @throws IOException	If an I/O error occurs while reading the file.
+	 */
 	private static String getFileContentFromResource(String filename) throws IOException{
 		//the class loader that loaded the class
 		final ClassLoader classLoader = Service.class.getClassLoader();
@@ -188,6 +238,21 @@ public class Service{
 	}
 
 
+	private static List<String> extractIDs(String input){
+		final List<String> ids = new ArrayList<>();
+		final Matcher matcher = ID_PATTERN.matcher(input);
+		while(matcher.find())
+			ids.add(matcher.group(1));
+		return ids;
+	}
+
+
+	/**
+	 * Extracts KaTeX code from the given input string.
+	 *
+	 * @param input	The input string with KaTeX code.
+	 * @return	The list of extracted KaTeX codes.
+	 */
 	private static List<String> extractKaTeXCode(String input){
 		final List<String> katexCodes = new ArrayList<>();
 		final Matcher matcher = KATEX_PATTERN.matcher(input);
@@ -196,6 +261,13 @@ public class Service{
 		return katexCodes;
 	}
 
+	/**
+	 * Replaces KaTeX code with placeholders in the given input string.
+	 *
+	 * @param input	The input string with KaTeX code.
+	 * @param katexCodes	The list of KaTeX codes to be replaced.
+	 * @return	The input string with KaTeX code replaced with placeholders.
+	 */
 	private static String replaceKaTeXCodeWithPlaceholders(String input, final List<String> katexCodes){
 		final int size = katexCodes.size();
 		for(int i = 0; i < size; i ++)
@@ -203,6 +275,13 @@ public class Service{
 		return input;
 	}
 
+	/**
+	 * Reinserts the KaTeX code into the input string.
+	 *
+	 * @param input	The input string with placeholders for KaTeX code.
+	 * @param katexCodes	The list of KaTeX codes to be reinserted.
+	 * @return	The input string with the KaTeX code replaced.
+	 */
 	private static String reinsertKaTeXCode(String input, final List<String> katexCodes){
 		final int size = katexCodes.size();
 		for(int i = 0; i < size; i ++)
@@ -211,6 +290,12 @@ public class Service{
 	}
 
 
+	/**
+	 * Obfuscates emails in a given input string.
+	 *
+	 * @param input	The input string containing emails.
+	 * @return	The input string with obfuscated emails.
+	 */
 	private static String obfuscateEmails(final String input){
 		String replacement = input;
 		int start = replacement.indexOf("<a ");
@@ -237,6 +322,13 @@ public class Service{
 		return replacement;
 	}
 
+	/**
+	 * Encodes a given string using a specified key.
+	 *
+	 * @param decoded	The string to be encoded.
+	 * @param key	The key used for encoding.
+	 * @return	The encoded string.
+	 */
 	private static String encode(final String decoded, final int key){
 		final StringBuilder sb = new StringBuilder(make2DigitsLong(key));
 		for(int n = 0; n < decoded.length(); n ++)
@@ -244,12 +336,31 @@ public class Service{
 		return sb.toString();
 	}
 
+	/**
+	 * Converts an integer value to a 2-digit hexadecimal string.
+	 * <p>If the hexadecimal string is shorter than 2 characters, it prepends a 0.</p>
+	 *
+	 * @param value	The integer value to be converted.
+	 * @return	The 2-digit hexadecimal string.
+	 */
 	private static String make2DigitsLong(final int value){
 		final String hex = Integer.toHexString(value);
 		return (hex.length() < 2? "0" + hex: hex);
 	}
 
 
+	/**
+	 * Replaces placeholders in an HTML template with values from properties and generates the final HTML string.
+	 *
+	 * @param document	The node representing the parsed HTML document.
+	 * @param file	The file containing the properties.
+	 * @param generateTOC	Flag indicating whether to generate a table of contents.
+	 * @param hasDetailsTag	Flag indicating whether the document contains details tags.
+	 * @param preventCopying	Flag indicating whether to prevent text copying in the generated HTML.
+	 * @param katexCodes	The list of extracted KaTeX codes.
+	 * @return	The generated HTML string with replaced placeholders.
+	 * @throws IOException	If an I/O error occurs while loading resources or reading the file.
+	 */
 	private static String replacePlaceholders(final Node document, final File file, final boolean generateTOC,
 			final boolean hasDetailsTag, final boolean preventCopying, final List<String> katexCodes) throws IOException{
 		String htmlTemplate = getFileContentFromResource("html-template.html");
@@ -287,6 +398,12 @@ public class Service{
 		return htmlTemplate.replace("${body}", body);
 	}
 
+	/**
+	 * Loads properties from a file.
+	 *
+	 * @param file	The file containing the properties.
+	 * @return	The loaded properties.
+	 */
 	private static Properties loadProperties(final File file){
 		final Properties properties = new Properties();
 		final String filename = file.getAbsolutePath()
