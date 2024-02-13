@@ -76,6 +76,7 @@ audio:not([controls]) { display: none; height: 0; }
 img { border-style: none; max-width: 100%; }
 img._center { display: block; margin: auto; }
 img._blur{ filter: blur(1.5rem); -webkit-filter: blur(1.5rem); }
+*:not(img)._blur { display: none; }
 ._separator { max-height: 300px; }
 ._separator-half { max-height: 150px; }
 ._copyright-protection { float: right; }
