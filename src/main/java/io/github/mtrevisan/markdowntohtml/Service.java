@@ -97,8 +97,8 @@ public class Service{
 	}
 
 	/*
-	add this javascript code to manage `eml` elements:
-	for(var el of document.getElementsByClassName('eml'))
+	add this javascript code to manage `a[href^="mailto:"]` elements:
+	for(var el of document.getElementsByClassName('a[href^="mailto:"]'))
 		el.href = decode(el.href.split('/').pop());
 	function decode(encoded){
 		var decoded = '';
@@ -304,18 +304,15 @@ public class Service{
 
 			final int startHRef = replacement.indexOf("href=\"", start + 3);
 			final int endHRef = replacement.indexOf("\"", startHRef + 6);
-			if(replacement.substring(start, end).contains("class=\"eml\"")){
-				final String href = replacement.substring(startHRef + 6, endHRef);
-
-				replacement = replacement.substring(0, startHRef)
-					+ "href=\""
-					+ encode(href, RANDOM.nextInt(256))
+			final String href = replacement.substring(startHRef + 6, endHRef);
+			if(href.startsWith("mailto:"))
+				replacement = replacement.substring(0, startHRef + 6)
+					+ ":"
+					+ encode(href.substring(6 + 7), RANDOM.nextInt(256))
 					+ "\""
 					+ replacement.substring(endHRef + 1);
-			}
 
-			end = replacement.indexOf(">", start + 3);
-			start = replacement.indexOf("<a ", end + 1);
+			start = replacement.indexOf("<a ", startHRef);
 		}
 		return replacement;
 	}

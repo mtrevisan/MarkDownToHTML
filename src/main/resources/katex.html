@@ -11,4 +11,4 @@
 {left: '\\begin{CD}', right: '\\end{CD}', display: true},
 {left: '\\[', right: '\\]', display: true}
 ], throwOnError: false});"></script>
-<script type="text/javascript">function toggleNSFWImageDisplay(s){for(var e of s.getElementsByClassName("_nsfw"))e.classList.toggle("_blur")}window.onload=function(){document.querySelectorAll('.eml').forEach(a=>{var p=a.href.split('/').pop().match(/.{2}/g).map(h=>parseInt(h,16));a.href=String.fromCharCode(...p.slice(1).map(x=>x^p[0]))})}</script>
+<script type="text/javascript">function toggleNSFWDisplay(s){s.querySelectorAll('._nsfw').forEach(e=>e.classList.toggle('_blur'))}window.onload=function(){document.querySelectorAll('a[href^=":"]').forEach(a=>{var p=a.href.split(':').pop().match(/.{2}/g).map(h=>parseInt(h,16));a.href=String.fromCharCode(...p.slice(1).map(x=>x^p[0]))})}</script>
