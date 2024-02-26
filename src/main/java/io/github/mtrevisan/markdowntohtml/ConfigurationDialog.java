@@ -4,6 +4,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -22,9 +23,10 @@ public class ConfigurationDialog extends JDialog{
 	private boolean preventCopying;
 
 
-	public ConfigurationDialog(final String title, final Frame owner){
-		super(owner, title, true);
+	public ConfigurationDialog(final String filename, final Frame owner){
+		super(owner, "Configuration", true);
 
+		final JLabel filenameLabel = new JLabel(filename);
 		final JCheckBox generateTOCCheckBox = new JCheckBox("Generate TOC");
 		final JCheckBox preventCopyingCheckBox = new JCheckBox("Prevent copying");
 		final JButton confirmButton = new JButton("Confirm");
@@ -38,7 +40,8 @@ public class ConfigurationDialog extends JDialog{
 		final JPanel mainPanel = new JPanel(new BorderLayout());
 		mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-		final JPanel contentPanel = new JPanel(new GridLayout(2, 1, 5, 5));
+		final JPanel contentPanel = new JPanel(new GridLayout(3, 1, 5, 5));
+		contentPanel.add(filenameLabel);
 		contentPanel.add(generateTOCCheckBox);
 		contentPanel.add(preventCopyingCheckBox);
 		mainPanel.add(contentPanel, BorderLayout.CENTER);

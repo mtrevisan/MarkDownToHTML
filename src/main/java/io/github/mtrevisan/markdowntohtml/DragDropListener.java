@@ -103,7 +103,7 @@ public class DragDropListener implements DropTargetListener{
 							continue;
 						}
 
-						final ConfigurationDialog configurationDialog = new ConfigurationDialog("Configuration: " + file.getName(), parent);
+						final ConfigurationDialog configurationDialog = new ConfigurationDialog(file.getName(), parent);
 						configurationDialog.setMinimumSize(new Dimension(250, 100));
 						configurationDialog.setVisible(true);
 						final boolean generateTOC = configurationDialog.isGenerateTOC();
