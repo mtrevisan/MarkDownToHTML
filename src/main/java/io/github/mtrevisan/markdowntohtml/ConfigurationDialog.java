@@ -22,8 +22,8 @@ public class ConfigurationDialog extends JDialog{
 	private boolean preventCopying;
 
 
-	public ConfigurationDialog(final Frame owner){
-		super(owner, "Configuration", true);
+	public ConfigurationDialog(final String title, final Frame owner){
+		super(owner, title, true);
 
 		final JCheckBox generateTOCCheckBox = new JCheckBox("Generate TOC");
 		final JCheckBox preventCopyingCheckBox = new JCheckBox("Prevent copying");
@@ -78,7 +78,7 @@ public class ConfigurationDialog extends JDialog{
 			e.printStackTrace();
 		}
 
-		ConfigurationDialog dialog = new ConfigurationDialog(null);
+		ConfigurationDialog dialog = new ConfigurationDialog("Config", null);
 		dialog.setMinimumSize(new Dimension(170, 100));
 		dialog.setLocationRelativeTo(null);
 		dialog.setVisible(true);
