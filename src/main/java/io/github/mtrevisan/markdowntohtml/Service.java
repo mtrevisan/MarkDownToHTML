@@ -63,6 +63,8 @@ public class Service{
 
 	private static final Pattern ID_PATTERN = Pattern.compile("id\\s*=\\s*\"([^\"]*?)\"",
 		Pattern.MULTILINE | Pattern.UNICODE_CASE);
+	private static final Pattern LOCAL_LINK_PATTERN = Pattern.compile("\\[\\[(.+?)\\]\\](?!\\()",
+		Pattern.MULTILINE | Pattern.UNICODE_CASE);
 	private static final Pattern KATEX_PATTERN = Pattern.compile("(?:^|[^\\\\])(\\$\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$\\$|\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$)",
 		Pattern.MULTILINE | Pattern.UNICODE_CASE);
 
@@ -133,6 +135,8 @@ public class Service{
 			String content = r.lines()
 				.collect(Collectors.joining("\n"));
 
+			content = removeLocalLinks(content);
+
 			//extract KaTeX code
 			final List<String> katexCodes = extractKaTeXCode(content);
 			content = replaceKaTeXCodeWithPlaceholders(content, katexCodes);
@@ -146,7 +150,8 @@ public class Service{
 			final Node document = PARSER.parse(content);
 
 			//replace placeholders:
-			return replacePlaceholders(document, file, generateTOC, hasDetailsTag, preventCopying, katexCodes);
+			final Properties properties = loadProperties(file);
+			return replacePlaceholders(document, properties, generateTOC, hasDetailsTag, preventCopying, katexCodes);
 		}
 	}
 
@@ -236,7 +241,17 @@ public class Service{
 	}
 
 
-	private static List<String> extractIDs(String input){
+	private static String removeLocalLinks(final String input){
+		final Matcher matcher = LOCAL_LINK_PATTERN.matcher(input);
+		final StringBuilder sb = new StringBuilder();
+		while(matcher.find())
+			matcher.appendReplacement(sb, matcher.group(1));
+		matcher.appendTail(sb);
+		return sb.toString();
+	}
+
+
+	private static List<String> extractIDs(final String input){
 		final List<String> ids = new ArrayList<>();
 		final Matcher matcher = ID_PATTERN.matcher(input);
 		while(matcher.find())
@@ -251,7 +266,7 @@ public class Service{
 	 * @param input	The input string with KaTeX code.
 	 * @return	The list of extracted KaTeX codes.
 	 */
-	private static List<String> extractKaTeXCode(String input){
+	private static List<String> extractKaTeXCode(final String input){
 		final List<String> katexCodes = new ArrayList<>();
 		final Matcher matcher = KATEX_PATTERN.matcher(input);
 		while(matcher.find())
@@ -348,7 +363,7 @@ public class Service{
 	 * Replaces placeholders in an HTML template with values from properties and generates the final HTML string.
 	 *
 	 * @param document	The node representing the parsed HTML document.
-	 * @param file	The file containing the properties.
+	 * @param properties	The properties.
 	 * @param generateTOC	Flag indicating whether to generate a table of contents.
 	 * @param hasDetailsTag	Flag indicating whether the document contains details tags.
 	 * @param preventCopying	Flag indicating whether to prevent text copying in the generated HTML.
@@ -356,11 +371,10 @@ public class Service{
 	 * @return	The generated HTML string with replaced placeholders.
 	 * @throws IOException	If an I/O error occurs while loading resources or reading the file.
 	 */
-	private static String replacePlaceholders(final Node document, final File file, final boolean generateTOC,
+	private static String replacePlaceholders(final Node document, final Properties properties, final boolean generateTOC,
 			final boolean hasDetailsTag, final boolean preventCopying, final List<String> katexCodes) throws IOException{
 		String htmlTemplate = getFileContentFromResource("html-template.html");
 
-		final Properties properties = loadProperties(file);
 		final Set<String> keys = properties.stringPropertyNames();
 		for(final String key : keys){
 			final String value = properties.getProperty(key);
