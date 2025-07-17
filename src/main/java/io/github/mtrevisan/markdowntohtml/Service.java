@@ -65,8 +65,10 @@ public class Service{
 		Pattern.MULTILINE | Pattern.UNICODE_CASE);
 	private static final Pattern LOCAL_LINK_PATTERN = Pattern.compile("\\[\\[(.+?)\\]\\](?!\\()",
 		Pattern.MULTILINE | Pattern.UNICODE_CASE);
-	private static final Pattern KATEX_PATTERN = Pattern.compile("(?:^|[^\\\\])(\\$\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$\\$|\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$)",
+	private static final Pattern KATEX_PATTERN = Pattern.compile("(?<!\\\\)(\\$\\$.*?\\$\\$|\\$(?!\\$).*?\\$)",
 		Pattern.MULTILINE | Pattern.UNICODE_CASE);
+//	private static final Pattern KATEX_PATTERN = Pattern.compile("(?:^|[^\\\\])(\\$\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$\\$|\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$)",
+//		Pattern.MULTILINE | Pattern.UNICODE_CASE);
 
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
 
@@ -269,8 +271,12 @@ public class Service{
 	private static List<String> extractKaTeXCode(final String input){
 		final List<String> katexCodes = new ArrayList<>();
 		final Matcher matcher = KATEX_PATTERN.matcher(input);
-		while(matcher.find())
-			katexCodes.add(matcher.group(1));
+		try{
+			while(matcher.find())
+				katexCodes.add(matcher.group(1));
+		}catch(Throwable e){
+			e.printStackTrace();
+		}
 		return katexCodes;
 	}
 
