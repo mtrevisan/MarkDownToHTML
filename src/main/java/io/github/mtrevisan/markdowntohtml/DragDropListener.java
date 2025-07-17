@@ -118,25 +118,37 @@ public class DragDropListener implements DropTargetListener{
 							JOptionPane.showMessageDialog(null, "There are duplicated IDs: " + duplicatedIDs,
 								"Duplicated IDs found", JOptionPane.INFORMATION_MESSAGE);
 
-						final String html = Service.convert(file, generateTOC, preventCopying);
+						try{
+							final String html = Service.convert(file, generateTOC, preventCopying);
 
-						final JOptionPane outPane = new JOptionPane();
-						outPane.setMessage("Output saved");
-						outPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
-						outPane.setOptionType(JOptionPane.DEFAULT_OPTION);
-						//save output
-						final File outFile = new File(outFolder, FileUtil.getNameOnly(file) + ".html");
-						try(final FileWriter writer = new FileWriter(outFile, StandardCharsets.UTF_8)){
-							writer.write(html);
+							final JOptionPane outPane = new JOptionPane();
+							outPane.setMessage("Output saved");
+							outPane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
+							outPane.setOptionType(JOptionPane.DEFAULT_OPTION);
+							//save output
+							final File outFile = new File(outFolder, FileUtil.getNameOnly(file) + ".html");
+							try(final FileWriter writer = new FileWriter(outFile, StandardCharsets.UTF_8)){
+								writer.write(html);
+							}
+							catch(final IOException e){
+								e.printStackTrace();
+
+								outPane.setMessage("Processing error");
+								outPane.setMessageType(JOptionPane.ERROR_MESSAGE);
+							}
+							final JDialog resultDialog = outPane.createDialog(null, "Processing result");
+							resultDialog.setVisible(true);
 						}
-						catch(final IOException e){
-							e.printStackTrace();
+						catch(final Throwable t){
+							t.printStackTrace();
 
-							outPane.setMessage("Processing error");
+							final JOptionPane outPane = new JOptionPane();
+							outPane.setMessage("Conversion error: " + t.getClass().getName());
 							outPane.setMessageType(JOptionPane.ERROR_MESSAGE);
+							outPane.setOptionType(JOptionPane.DEFAULT_OPTION);
+							final JDialog resultDialog = outPane.createDialog(null, "Processing result");
+							resultDialog.setVisible(true);
 						}
-						final JDialog resultDialog = outPane.createDialog(null, "Processing result");
-						resultDialog.setVisible(true);
 					}
 				}
 			}
