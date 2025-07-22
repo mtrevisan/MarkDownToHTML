@@ -63,12 +63,12 @@ public class Service{
 
 	private static final Pattern ID_PATTERN = Pattern.compile("id\\s*=\\s*\"([^\"]*?)\"",
 		Pattern.MULTILINE | Pattern.UNICODE_CASE);
-	private static final Pattern LOCAL_LINK_PATTERN = Pattern.compile("\\[\\[(.+?)\\]\\](?!\\()",
+	private static final Pattern LOCAL_LINK_PATTERN = Pattern.compile("\\[\\[(.+?)]](?!\\()",
 		Pattern.MULTILINE | Pattern.UNICODE_CASE);
-	private static final Pattern KATEX_PATTERN = Pattern.compile("(?<!\\\\)(\\$\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$\\$|\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$)",
-		Pattern.MULTILINE | Pattern.UNICODE_CASE);
-//	private static final Pattern KATEX_PATTERN = Pattern.compile("(?:^|[^\\\\])(\\$\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$\\$|\\$(?:[^$]|\\\\\\$)*?[^\\\\]\\$)",
-//		Pattern.MULTILINE | Pattern.UNICODE_CASE);
+	private static final Pattern KATEX_BLOCK_PATTERN = Pattern.compile("(?<!\\\\)(\\$\\$.*?(?<!\\\\)\\$\\$)",
+		Pattern.DOTALL | Pattern.UNICODE_CASE);
+	private static final Pattern KATEX_INLINE_PATTERN = Pattern.compile("(?<!\\\\)(\\$(?!\\$).*?(?<!\\\\)\\$)",
+		Pattern.DOTALL | Pattern.UNICODE_CASE);
 
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
 
@@ -270,9 +270,29 @@ public class Service{
 	 */
 	private static List<String> extractKaTeXCode(final String input){
 		final List<String> katexCodes = new ArrayList<>();
-		final Matcher matcher = KATEX_PATTERN.matcher(input);
-		while(matcher.find())
-			katexCodes.add(matcher.group(1));
+		final List<int[]> blockRanges = new ArrayList<>();
+
+		//step 1: Find blocks $$...$$
+		final Matcher blockMatcher = KATEX_BLOCK_PATTERN.matcher(input);
+		while(blockMatcher.find()){
+			katexCodes.add(blockMatcher.group(1));
+			blockRanges.add(new int[]{blockMatcher.start(), blockMatcher.end()});
+		}
+
+		//step 2: Find $...$ only outside blocks $$
+		final Matcher inlineMatcher = KATEX_INLINE_PATTERN.matcher(input);
+		while(inlineMatcher.find()){
+			final int start = inlineMatcher.start();
+			boolean insideBlock = false;
+			for(final int[] range : blockRanges)
+				if(start >= range[0] && start < range[1]){
+					insideBlock = true;
+					break;
+				}
+			if(!insideBlock)
+				katexCodes.add(inlineMatcher.group(1));
+		}
+
 		return katexCodes;
 	}
 
