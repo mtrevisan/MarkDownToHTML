@@ -70,6 +70,8 @@ public class Service{
 	private static final Pattern KATEX_INLINE_PATTERN = Pattern.compile("(?<!\\\\)(\\$(?!\\$).*?(?<!\\\\)\\$)",
 		Pattern.DOTALL | Pattern.UNICODE_CASE);
 
+	private static final Pattern PATTERN_MAILTO = Pattern.compile("<a\\b[^>]*href=\"mailto:([^\"]+)\"[^>]*>");
+
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
 
 
@@ -332,26 +334,39 @@ public class Service{
 	 * @return	The input string with obfuscated emails.
 	 */
 	private static String obfuscateEmails(final String input){
-		String replacement = input;
-		int start = replacement.indexOf("<a ");
-		while(start != -1){
-			int end = replacement.indexOf(">", start + 3);
-			if(end == -1)
-				break;
-
-			final int startHRef = replacement.indexOf("href=\"", start + 3);
-			final int endHRef = replacement.indexOf("\"", startHRef + 6);
-			final String href = replacement.substring(startHRef + 6, endHRef);
-			if(href.startsWith("mailto:"))
-				replacement = replacement.substring(0, startHRef + 6)
-					+ ":"
-					+ encode(href.substring(6 + 7), RANDOM.nextInt(256))
-					+ "\""
-					+ replacement.substring(endHRef + 1);
-
-			start = replacement.indexOf("<a ", startHRef);
+		final Matcher matcher = PATTERN_MAILTO.matcher(input);
+		final StringBuilder result = new StringBuilder();
+		while(matcher.find()){
+			final String emailPart = matcher.group(1);
+			final String encrypted = encode(emailPart, RANDOM.nextInt(256));
+			final String replacement = matcher.group(0).replaceFirst("href=\"mailto:[^\"]+\"",
+				"href=\":" + encrypted + "\"");
+			matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
 		}
-		return replacement;
+		matcher.appendTail(result);
+		return result.toString();
+
+
+//		String replacement = input;
+//		int start = replacement.indexOf("<a ");
+//		while(start != -1){
+//			int end = replacement.indexOf(">", start + 3);
+//			if(end == -1)
+//				break;
+//
+//			final int startHRef = replacement.indexOf("href=\"", start + 3);
+//			final int endHRef = replacement.indexOf("\"", startHRef + 6);
+//			final String href = replacement.substring(startHRef + 6, endHRef);
+//			if(href.startsWith("mailto:"))
+//				replacement = replacement.substring(0, startHRef + 6)
+//					+ ":"
+//					+ encode(href.substring(6 + 7), RANDOM.nextInt(256))
+//					+ "\""
+//					+ replacement.substring(endHRef + 1);
+//
+//			start = replacement.indexOf("<a ", startHRef);
+//		}
+//		return replacement;
 	}
 
 	/**
