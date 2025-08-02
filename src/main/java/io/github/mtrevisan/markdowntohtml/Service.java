@@ -65,9 +65,7 @@ public class Service{
 		Pattern.MULTILINE | Pattern.UNICODE_CASE);
 	private static final Pattern LOCAL_LINK_PATTERN = Pattern.compile("\\[\\[(.+?)]](?!\\()",
 		Pattern.MULTILINE | Pattern.UNICODE_CASE);
-	private static final Pattern KATEX_BLOCK_PATTERN = Pattern.compile("(?<!\\\\)(\\$\\$.*?(?<!\\\\)\\$\\$)",
-		Pattern.DOTALL | Pattern.UNICODE_CASE);
-	private static final Pattern KATEX_INLINE_PATTERN = Pattern.compile("(?<!\\\\)(\\$(?!\\$).*?(?<!\\\\)\\$)",
+	private static final Pattern KATEX_PATTERN = Pattern.compile("(?<!\\\\)(?<!\\\\\\\\)(\\$.+?\\$)(?!\\$)",
 		Pattern.DOTALL | Pattern.UNICODE_CASE);
 
 	private static final Pattern PATTERN_MAILTO = Pattern.compile("<a\\b[^>]*href=\"mailto:([^\"]+)\"[^>]*>");
@@ -272,29 +270,9 @@ public class Service{
 	 */
 	private static List<String> extractKaTeXCode(final String input){
 		final List<String> katexCodes = new ArrayList<>();
-		final List<int[]> blockRanges = new ArrayList<>();
-
-		//step 1: Find blocks $$...$$
-		final Matcher blockMatcher = KATEX_BLOCK_PATTERN.matcher(input);
-		while(blockMatcher.find()){
-			katexCodes.add(blockMatcher.group(1));
-			blockRanges.add(new int[]{blockMatcher.start(), blockMatcher.end()});
-		}
-
-		//step 2: Find $...$ only outside blocks $$
-		final Matcher inlineMatcher = KATEX_INLINE_PATTERN.matcher(input);
-		while(inlineMatcher.find()){
-			final int start = inlineMatcher.start();
-			boolean insideBlock = false;
-			for(final int[] range : blockRanges)
-				if(start >= range[0] && start < range[1]){
-					insideBlock = true;
-					break;
-				}
-			if(!insideBlock)
-				katexCodes.add(inlineMatcher.group(1));
-		}
-
+		final Matcher inlineMatcher = KATEX_PATTERN.matcher(input);
+		while(inlineMatcher.find())
+			katexCodes.add(inlineMatcher.group(1));
 		return katexCodes;
 	}
 
@@ -345,28 +323,6 @@ public class Service{
 		}
 		matcher.appendTail(result);
 		return result.toString();
-
-
-//		String replacement = input;
-//		int start = replacement.indexOf("<a ");
-//		while(start != -1){
-//			int end = replacement.indexOf(">", start + 3);
-//			if(end == -1)
-//				break;
-//
-//			final int startHRef = replacement.indexOf("href=\"", start + 3);
-//			final int endHRef = replacement.indexOf("\"", startHRef + 6);
-//			final String href = replacement.substring(startHRef + 6, endHRef);
-//			if(href.startsWith("mailto:"))
-//				replacement = replacement.substring(0, startHRef + 6)
-//					+ ":"
-//					+ encode(href.substring(6 + 7), RANDOM.nextInt(256))
-//					+ "\""
-//					+ replacement.substring(endHRef + 1);
-//
-//			start = replacement.indexOf("<a ", startHRef);
-//		}
-//		return replacement;
 	}
 
 	/**
