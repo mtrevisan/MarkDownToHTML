@@ -385,13 +385,15 @@ public class Service{
 		htmlTemplate = htmlTemplate.replace("${modified-datetime}", DATE_TIME_FORMATTER.format(ZonedDateTime.now()));
 
 
-		final String stylesheet = getFileContentFromResource("stylesheet.css");
+		final String stylesheet = getFileContentFromResource(preventCopying
+				? "stylesheet-prevent-copy.css"
+				: "stylesheet.css");
 		final String katex = getFileContentFromResource("katex.html");
 		final String openDetailsWhenPrintingScript = (hasDetailsTag
 			? getFileContentFromResource("open-details-when-printing.html")
 			: "");
 		final String preventCopyingScript = (preventCopying
-			? getFileContentFromResource("prevent-copying.html")
+			? getFileContentFromResource("prevent-copy.html")
 			: "");
 		htmlTemplate = htmlTemplate
 			.replace("${stylesheet}", stylesheet)
