@@ -393,11 +393,8 @@ public class Service{
 		final String preventCopyingScript = (preventCopying
 			? getFileContentFromResource("prevent-copying.html")
 			: "");
-		final String preventCopyingCSS = (preventCopying
-			? getFileContentFromResource("prevent-copying.css")
-			: "");
 		htmlTemplate = htmlTemplate
-			.replace("${stylesheet}", stylesheet + preventCopyingCSS)
+			.replace("${stylesheet}", stylesheet)
 			.replace("${katex}", katex)
 			.replace("${scripts}", openDetailsWhenPrintingScript + preventCopyingScript);
 		final String html = RENDERER.render(document);
