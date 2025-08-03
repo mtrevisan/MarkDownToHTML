@@ -102,14 +102,14 @@ public class Service{
 
 	/*
 	add this javascript code to manage `a[href^="mailto:"]` elements:
-	for(var el of document.getElementsByClassName('a[href^="mailto:"]'))
-		el.href = decode(el.href.split('/').pop());
-	function decode(encoded){
-		var decoded = '';
-		var key = parseInt(encoded.substr(0, 2), 16);
-		for(var i = 2; i < encoded.length; i += 2)
-			decoded += String.fromCharCode(parseInt(encoded.substr(i, 2), 16) ^ key);
-		return decoded;
+	window.onload=function(){
+		document.querySelectorAll('a[href^=":"]').forEach(a =>{
+			let b = atob(a.getAttribute('href').slice(1));
+			let k = b.charCodeAt(0);
+			a.href = [...b].slice(1)
+				.map(c => String.fromCharCode(c.charCodeAt(0) ^ k))
+				.join('');
+		})
 	}
 	*/
 
@@ -317,8 +317,8 @@ public class Service{
 		while(matcher.find()){
 			final String emailPart = matcher.group(1);
 			final String encrypted = encode(emailPart, RANDOM.nextInt(256));
-			final String replacement = matcher.group(0).replaceFirst("href=\"mailto:[^\"]+\"",
-				"href=\":" + encrypted + "\"");
+			final String replacement = matcher.group(0)
+				.replaceFirst("href=\"mailto:[^\"]+\"", "href=\":" + encrypted + "\"");
 			matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
 		}
 		matcher.appendTail(result);
@@ -332,11 +332,19 @@ public class Service{
 	 * @param key	The key used for encoding.
 	 * @return	The encoded string.
 	 */
+	private static final java.util.Base64.Encoder encoder = java.util.Base64.getEncoder();
 	private static String encode(final String decoded, final int key){
-		final StringBuilder sb = new StringBuilder(make2DigitsLong(key));
-		for(int n = 0; n < decoded.length(); n ++)
-			sb.append(make2DigitsLong(decoded.charAt(n) ^ key));
-		return sb.toString();
+//		final StringBuilder sb = new StringBuilder(make2DigitsLong(key));
+//		for(int n = 0; n < decoded.length(); n ++)
+//			sb.append(make2DigitsLong(decoded.charAt(n) ^ key));
+//		return sb.toString();
+
+		final byte[] inputBytes = decoded.getBytes();
+		final byte[] result = new byte[inputBytes.length + 1];
+		result[0] = (byte)key;
+		for(int i = 0; i < inputBytes.length; i ++)
+			result[i + 1] = (byte)(inputBytes[i] ^ key);
+		return encoder.encodeToString(result);
 	}
 
 	/**
