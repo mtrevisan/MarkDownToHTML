@@ -133,6 +133,7 @@ dt { font-weight: 700 }
 ._task-list-item { list-style-type: none; }
 ._task-list-item-checkbox { margin: 0 .2em 0 -1.3em; }
 ._footnote { font-size: .8em; position: relative; top: -.25em; vertical-align: top; }
+._small-caps { font-variant: small-caps; letter-spacing: 0.5px; }
 
 ._imgd button._imgd-active span._imgd:not(._imgd-icon-active), ._imgd button:not(._imgd-active) span._imgd._imgd-icon-active { display: none; }
 ._imgd button._imgd-active { cursor: inherit; }
