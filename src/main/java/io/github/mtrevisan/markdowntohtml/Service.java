@@ -132,7 +132,8 @@ public class Service{
 	 * @return	The converted content as HTML.
 	 * @throws IOException	If an I/O error occurs while reading the file or loading resources.
 	 */
-	public static String convert(final File file, final boolean generateTOC, final boolean preventCopying) throws IOException{
+	public static String convert(final File file, final boolean generateTOC, final boolean preventCopying)
+			throws IOException{
 		try(final BufferedReader r = getBufferedReader(file)){
 			String content = r.lines()
 				.collect(Collectors.joining("\n"));
@@ -190,10 +191,10 @@ public class Service{
 				if(sectionHeading.getLevel() == 1 && i > 0)
 					toc.append(tocTemplateEnd);
 
-				final String heading = RENDERER.render(PARSER.parse(sectionHeading.getText()));
+				final String headingText = sectionHeading.getText().toString();
 				toc.append((sectionHeading.getLevel() == 1? tocTemplateBegin: tocTemplateItem)
 					.replace("${id}", sectionHeading.getAnchorRefId())
-					.replace("${heading}", heading.substring("<p>".length(), heading.length() - "</p>".length() - 1)));
+					.replace("${heading}", headingText));
 			}
 			toc.append(tocTemplateEnd);
 
