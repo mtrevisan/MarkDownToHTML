@@ -115,7 +115,7 @@ ol ol, ol ul, ul ol, ul ul { margin: 0; }
 a { color: #0c93e4; background-color: transparent; -webkit-text-decoration-skip: objects; text-decoration: underline; }
 a.italic-link { font-style: italic; }
 a:focus, a:hover { text-decoration: none; }
-table { background-color: transparent; border-collapse: collapse; border-spacing: 0; }
+table { background-color: transparent; border-collapse: collapse; border-spacing: 0; margin-left: auto; margin-right: auto; }
 td, th { border-right: 1px solid #dcdcdc; padding: 8px 12px; page-break-inside: avoid; }
 td:last-child, th:last-child { border-right: 0; }
 td { border-top: 1px solid #dcdcdc; }
@@ -142,6 +142,10 @@ body._imgd-hide ._img-container { display: none !important; }
 
 img._nsfw { z-index: 0; cursor: pointer; }
 ._nsfw-text { position: absolute; top: 0; left: 50%; height: 100%; display: flex; align-items: center; z-index: 1; color: red; text-shadow: 1px 1px 0 #FFF, -1px -1px 0 #FFF, 1px -1px 0 #FFF, -1px 1px 0 #FFF; text-align: center; transform: translateX(13%); cursor: pointer; }
+
+.flip-horizontal { display: inline-block; transform: scaleX(-1); }
+.flip-vertical { display: inline-block; transform: scaleY(-1); }
+.flip-horizontal-vertical { display: inline-block; transform: scale(-1, -1); }
 
 @media (min-width: 1060px) {
 	._navigation-column { display: block; }

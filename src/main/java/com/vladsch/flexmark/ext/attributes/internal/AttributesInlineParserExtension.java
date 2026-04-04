@@ -58,7 +58,7 @@ public class AttributesInlineParserExtension implements InlineParserExtension{
 						final BasedSequence attributeName = attributeText.subSequence(attributeMatcher.start(1), attributeMatcher.end(1));
 						final BasedSequence attributeSeparator = (attributeMatcher.groupCount() == 1 || attributeMatcher.start(2) == - 1? BasedSequence.NULL: attributeText.subSequence(attributeMatcher.end(1), attributeMatcher.start(2)).trim());
 						BasedSequence attributeValue = (attributeMatcher.groupCount() == 1 || attributeMatcher.start(2) == - 1? BasedSequence.NULL: attributeText.subSequence(attributeMatcher.start(2), attributeMatcher.end(2)));
-						final boolean isQuoted = (attributeValue.length() >= 2 && (attributeValue.charAt(0) == '"' && attributeValue.endCharAt(1) == '"' || attributeValue.charAt(0) == '\'' && attributeValue.endCharAt(1) == '\''));
+						final boolean isQuoted = (attributeValue.length() > 2 && (attributeValue.charAt(0) == '"' && attributeValue.endCharAt(1) == '"' || attributeValue.charAt(0) == '\'' && attributeValue.endCharAt(1) == '\''));
 						final BasedSequence attributeOpen = (!isQuoted? BasedSequence.NULL: attributeValue.subSequence(0, 1));
 						final BasedSequence attributeClose = (!isQuoted? BasedSequence.NULL: attributeValue.endSequence(1, 0));
 

@@ -78,13 +78,13 @@ public class Service{
 	static{
 		final MutableDataSet options = new MutableDataSet()
 			.set(Parser.REFERENCES_KEEP, KeepType.LAST)
-			.set(Parser.EXTENSIONS, List.of(TablesExtension.create(), TypographicExtension.create(), SubscriptExtension.create(),
-				FootnoteExtension.create()))
+			.set(Parser.EXTENSIONS, List.of(TablesExtension.create(), TypographicExtension.create(),
+				SubscriptExtension.create(), FootnoteExtension.create()))
 
 			.set(HtmlRenderer.INDENT_SIZE, 3)
 			.set(HtmlRenderer.PERCENT_ENCODE_URLS, true)
 			//convert soft-breaks to hard breaks
-			.set(HtmlRenderer.SOFT_BREAK, "<br />")
+			.set(HtmlRenderer.SOFT_BREAK, "<br />\n")
 			.set(HtmlRenderer.GENERATE_HEADER_ID, true)
 			.set(HtmlRenderer.HEADER_ID_GENERATOR_NO_DUPED_DASHES, true)
 			.set(HtmlRenderer.RENDER_HEADER_ID, true)

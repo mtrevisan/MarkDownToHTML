@@ -35,7 +35,7 @@ public class FootnoteLinkRefProcessor implements LinkRefProcessor{
 
 	@Override
 	public boolean isMatch(final BasedSequence nodeChars){
-		return (nodeChars.length() >= 3
+		return (nodeChars.length() > 3
 			&& nodeChars.charAt(0) == '['
 			&& nodeChars.charAt(1) == '^'
 			&& nodeChars.endCharAt(1) == ']');
